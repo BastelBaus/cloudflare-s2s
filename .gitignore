@@ -1,0 +1,6 @@
+.archive
+.container
+.env
+.conda
+
+**/*.pyc

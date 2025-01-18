@@ -1,0 +1,5 @@
+flask
+#nicegui
+#pyinstaller
+#pywebview
+#nicegui[highcharts]
