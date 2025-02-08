@@ -20,7 +20,9 @@ WORKDIR /var/app
 
 # copy application and entry point data
 COPY ./app .
-COPY ./entrypoint.sh  .
+COPY --chmod=755 ./entrypoint.sh  .
+RUN ["chmod", "+x", "./entrypoint.sh"]
+
 
 # the volume to store the wireguad configuration
 VOLUME /var/data/wireguard/ 
@@ -37,11 +39,21 @@ RUN apt-get --yes install --no-install-recommends  \
         wireguard \
         cargo                    
 
+# Add cloudflare gpg key
+RUN curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
+# Add this repo to your apt repositories
+RUN echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
+RUN type /etc/apt/sources.list.d/cloudflare-client.list
+# Install
+#RUN apt-get update && apt-get install cloudflare-warp
+
 # install cloudflare-warp client
-RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg 
-RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg 
-RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bookworm main" | tee /etc/apt/sources.list.d/cloudflare-client.list 
-RUN apt-get update &&  apt-get --yes install cloudflare-warp 
+#RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg 
+#RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg 
+#RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bookworm main" | tee /etc/apt/sources.list.d/cloudflare-client.list 
+#RUN apt-get update &&  apt-get --yes install cloudflare-warp 
+
+
 # clean the install
 RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*

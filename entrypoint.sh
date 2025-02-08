@@ -3,6 +3,8 @@
 # exit when any command fails
 #set -e
 
+echo Image built: $(cat /build-date.txt)
+
 ##############################################
 # setting up the cloudflare tunnel
 ##############################################
