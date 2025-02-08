@@ -21,5 +21,10 @@ The resulting key benefits are:
 # What is not implements
 
 * only one subnet can be mapped
+* only IPv4
 
 
+
+https://www.procustodibus.com/blog/2021/11/wireguard-nftables/
+
+https://www.procustodibus.com/blog/2020/12/wireguard-site-to-site-config/

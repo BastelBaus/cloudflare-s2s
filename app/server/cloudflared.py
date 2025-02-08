@@ -25,8 +25,8 @@ class warp_cli:
 
         #create unique ID
         #self.uuid = str(uuid.uuid4()) if use_uuid is None else use_uuid      
-        #self.queue = queue.Queue()
-        #self.async_proc  = None
+        self.queue = queue.Queue()
+        self.async_proc  = None
         #print(f"created cloudflare instance with uuid: {self.uuid}")
         
     def get_status(self):
@@ -63,7 +63,11 @@ class warp_cli:
     def settings(self):
         return self.__call_cloudflared('settings')            
         
+    def debug_network(self):
+        return self.__call_cloudflared('debug network')            
 
+    def debug_dex(self):
+        return self.__call_cloudflared('debug dex')            
         
     #################################################################
     # Private functions to handle the communication over the shell

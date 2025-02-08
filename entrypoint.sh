@@ -30,16 +30,22 @@ sleep "$WARP_SLEEP"
 
 # to this top accept the terms & conditions
 # since --accept-tos does nto work reliable
-#echo "y" | warp-cli status
+#echo "y" | warp-cli status 
+warp-cli status --accept-tos &
 
 ##############################################
 # setting up the wireguad tunnel
 ##############################################
 
-ip link add dev wg0 type wireguard
-#wg setconf wg0 /var/data/wireguard/myconfig.conf
-ip address add dev wg0 192.168.2.1/24
-ip link set up dev wg0
+#ip link add dev wg0 type wireguard
+#ip address add dev wg0 $CDIR_WG
+#wg setconf wg0 /var/app/wg.conf
+#ip link set up dev wg0
+
+#ip link add dev wg0 type wireguard
+#ip address add dev wg0 192.168.242.1/32
+#wg setconf wg0 /var/app/wg.conf
+#ip link set up dev wg0
 
 ##############################################
 # setting api-server and WebUI-server

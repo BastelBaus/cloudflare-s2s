@@ -4,9 +4,12 @@
 from flask import Flask, request 
 import os
 import logging
+import json
+
 
 from cloudflared import warp_cli
 from wireguard import wireguard
+from network import network
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +32,8 @@ print(f"{tunnel_token=}")
 
 warpcli = warp_cli(tunnel_token)
 wg = wireguard()
+net = network()
+
 
 app = Flask(__name__)
 
@@ -37,16 +42,17 @@ app = Flask(__name__)
 ###########################################################
 
 @app.get("/")
-def main():
-    return "Hello, World!"
+def main() -> str:    
+    ret_str = 'Welcome to bastelbaus cloudflared-s2s!\nlink to <a href="/api">api</s> '
+    return ret_str 
 
-def get_api_list():
+def get_api_list() -> str:
     list_of_aps =  ['%s' % rule for rule in app.url_map.iter_rules()]
     list_of_aps.pop(0) # remove the static paths
     return list_of_aps
 
 @app.get('/api')
-def api():
+def api() -> str:
     return get_api_list()
     
 #flask --app ./server/main run -p $API_PORT &
@@ -96,6 +102,14 @@ def show_organization():
 def settings():    
     return warpcli.settings()
 
+@app.get('/warp/debug/network')
+def debug_network():    
+    return warpcli.debug_network()
+
+@app.get('/warp/debug/dex')
+def debug_dex():    
+    return warpcli.debug_dex()
+
 
 
 ###########################################################
@@ -105,10 +119,25 @@ def settings():
 
 @app.get('/wg/keys/private')
 def get_privatkey():    
-    return wg.get_privatkey()
-
+    return { "status":"success", "privatekey":wg.get_privatkey()}
+    
 @app.get('/wg/keys/public')
 def get_publickey():    
     privatekey = request.args.get('privatekey')
-    if privatekey is None: return None
-    return wg.get_publickey( privatekey )
+    if privatekey is None: return {"status":"error","reason":"no private key given"}
+    return { "status":"success", "publickey":wg.get_publickey( privatekey ), "privatekey":privatekey}
+    
+
+###########################################################
+# The general network
+###########################################################
+
+
+
+@app.get('/net/interfaces')
+def get_interfaces():    
+    #y = json.loads(x)
+    return net.get_interfaces()
+
+
+
