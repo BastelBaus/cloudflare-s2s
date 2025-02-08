@@ -54,6 +54,8 @@ RUN pip install -r ./requirements.txt
 EXPOSE ${WEBUI_PORT}
 EXPOSE ${API_PORT}
 
+RUN date >/build-date.txt
+
 #CMD ["flask", "--app", "./server/main", "run","-p", "5000"]
 #CMD ["echo", "Docker setup finished"]
 # calling the entrypoint which starts the server and the client
