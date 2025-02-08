@@ -1,0 +1,16 @@
+#!/usr/sbin/nft -f
+
+define google_dns = 8.8.8.8
+
+add table monitoring 
+delete table monitoring
+
+table ip monitoring {
+    chain trace_chain { 
+        type filter hook prerouting priority -301;
+        ip protocol icmp meta nftrace set 1
+    }
+}
+
+
+list ruleset

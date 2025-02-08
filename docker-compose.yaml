@@ -15,7 +15,7 @@ services:
       - 51820:51820 # wireguard to test !
 
     volumes:
-      - "C:/Users/pagantroll/Dokumente/01_Projekte/06_Software_Programming/15_cloudflared-s2s/app:/var/app2"
+      - .//app:/var/app2"
       
     #volumes:
     #  - ./app:/app # mounting local app directory
