@@ -10,7 +10,7 @@ def frame(title: str, version : str):
         ui.label("").tailwind("px-0.5")
         
         ui.label(title).style('color: white; font-size: 125%;').tailwind("px-2.5 pl-4", "font-bold", "text-white-800")
-        ui.chip(version, color="grey").style("").props("outline")
+        #ui.chip(version, color="grey").style("").props("outline")
 
         ui.space()
         

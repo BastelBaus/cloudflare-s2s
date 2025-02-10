@@ -62,7 +62,13 @@ def api_html():
     list_of_aps = [f'<a href="http://localhost:{api_port}{ap}"> {ap} </a>' for ap in get_api_list()]
     str_of_aps  = "<br>\n".join(list_of_aps)
     return str_of_aps + "<br>\n"
-#flask --app ./server/main run -p $API_PORT &
+
+@app.get("/version")
+def version() -> str:    
+    ret_str
+    return ret_str
+
+
 
 ###########################################################
 # cloudflare warp-cli
