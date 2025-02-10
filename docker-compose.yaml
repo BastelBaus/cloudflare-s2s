@@ -64,9 +64,15 @@ networks:
 #  control_network:
 #    driver: bridge
 #    driver_opts:
+#<<<<<<< HEAD
 #       com.docker.network.bridge.host_binding_ipv4: "192.168.8.23"
 #       com.docker.network.bridge.gateway_mode_ipv4: "routed"
 #       docker.network.bridge.name: control_network
+#=======
+#       com.docker.network.bridge.host_binding_ipv4: "192.168.9.2"
+#       com.docker.network.bridge.gateway_mode_ipv4: "routed"
+#      # com.docker.network.bridge.name: control_network
+#>>>>>>> e93704896bce0f333c2cd71e04b5fd9a3d83fddd
 #    ipam:
 #      config:
 #        - subnet: "192.168.8.0/23"
@@ -74,6 +80,7 @@ networks:
 #          ip_range: "192.168.8.0/23"
 #  wireguard_bridge:
 #    driver: bridge
+#<<<<<<< HEAD
  #   driver_opts:
  #     docker.network.bridge.name: wgb
  ##     com.docker.network.bridge.gateway_mode_ipv4: "routed"
@@ -82,6 +89,15 @@ networks:
  #     config:
  #       - subnet: "192.168.1.0/24"
  #         gateway: "192.168.1.1"
+#=======
+#    driver_opts:
+#      com.docker.network.bridge.name: wgb
+#      com.docker.network.bridge.inhibit_ipv4: "true"
+#    ipam:
+#      config:
+#        - subnet: "192.168.22.0/24"
+#          gateway: "192.168.22.1"
+#>>>>>> e93704896bce0f333c2cd71e04b5fd9a3d83fddd
 
 
 #    networks:

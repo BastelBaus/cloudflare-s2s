@@ -54,10 +54,10 @@ ip link set up dev wg0
 # setting api-server and WebUI-server
 ##############################################
 
-flask --app ./server/main run -p $WEBUI_PORT &
 flask --app ./server/main run -p $API_PORT &
+flask --app ./client/main run -p $WEBUI_PORT &
 
-echo "Server started:"
+echo "Service started:"
 echo " API at port $API_PORT"
 echo " WebUI at port $WEBUI_PORT"
 #echo " TOKEN: $TUNNEL_TOKEN"
