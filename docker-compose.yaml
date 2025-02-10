@@ -2,6 +2,7 @@ services:
   cloudflare-s2s:
     image: cloudflared-s2s:staging
     #image: bastelbaus/cloudflared-s2s:latest    
+    pull_policy: build
     build:
       context: ./
       dockerfile: Dockerfile
@@ -15,8 +16,7 @@ services:
       - 51820:51820 # wireguard to test !
 
     volumes:
-      - .//app:/var/app2"
-      
+      - .//app:/var/app2
     #volumes:
     #  - ./app:/app # mounting local app directory
     #  - ~/cloudflared-mgr:/source
@@ -32,35 +32,56 @@ services:
     cap_add:
       - NET_ADMIN
     sysctls:
-      #- net.ipv6.conf.all.disable_ipv6=0
-      - net.ipv4.conf.all.src_valid_mark=1
+      - net.ipv6.conf.all.disable_ipv6=1
+#      - net.ipv4.conf.all.src_valid_mark=1
     networks:
-      control_network:
-          ipv4_address: 192.168.9.2
-      wireguard_bridge:
-
+      macvlan_network:
+        ipv4_address: 192.168.0.23
 
 networks:
-  control_network:
-    driver: bridge
+  macvlan_network:
+    driver: macvlan
     driver_opts:
-       com.docker.network.bridge.host_binding_ipv4: "192.168.9.2"
-       com.docker.network.bridge.gateway_mode_ipv4: "routed"
-      # com.docker.network.bridge.name: control_network
+      parent: eth0
     ipam:
+      driver: default
       config:
-        - subnet: "192.168.8.0/23"
-          gateway: "192.168.9.1"
-          ip_range: "192.168.8.0/23"
-  wireguard_bridge:
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.name: wgb
-      com.docker.network.bridge.inhibit_ipv4: "true"
-    ipam:
-      config:
-        - subnet: "192.168.22.0/24"
-          gateway: "192.168.22.1"
+       - subnet: 192.168.0.0/24
+#         ip_range: 192.168.1.23/32
+         gateway: 192.168.0.1
+
+
+
+
+
+#    networks:
+#      control_network:
+#          ipv4_address: 192.168.8.22
+#      wireguard_bridge:
+
+
+#networks:
+#  control_network:
+#    driver: bridge
+#    driver_opts:
+#       com.docker.network.bridge.host_binding_ipv4: "192.168.8.23"
+#       com.docker.network.bridge.gateway_mode_ipv4: "routed"
+#       docker.network.bridge.name: control_network
+#    ipam:
+#      config:
+#        - subnet: "192.168.8.0/23"
+#          gateway: "192.168.9.1"
+#          ip_range: "192.168.8.0/23"
+#  wireguard_bridge:
+#    driver: bridge
+ #   driver_opts:
+ #     docker.network.bridge.name: wgb
+ ##     com.docker.network.bridge.gateway_mode_ipv4: "routed"
+ #     #com.docker.network.bridge.inhibit_ipv4: true
+ #   ipam:
+ #     config:
+ #       - subnet: "192.168.1.0/24"
+ #         gateway: "192.168.1.1"
 
 
 #    networks:

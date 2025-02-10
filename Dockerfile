@@ -1,7 +1,8 @@
 # syntax=docker/dockerfile:1
 
 #FROM docker.io/library/debian:bookworm-slim
-FROM python:3.13-slim-bookworm
+#FROM python:3.13-slim-bookworm
+FROM python:3.21-alpine
 
 ENV WARP_SLEEP=2
 ENV WEBUI_PORT=15650
@@ -11,6 +12,8 @@ ENV API_PORT=15651
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV TUNNEL_TOKEN=${TUNNEL_TOKEN:-""}
 ENV CDIR_WG=192.168.242.1/24
+
+RUN date +%Y%m%d > /build-date.txt
 
 #ENV VERSION=$CLOUDFLARED_VERSION
 
@@ -37,15 +40,17 @@ RUN apt-get --yes install --no-install-recommends  \
         curl gpg ca-certificates dbus \
         cron tcpdump iputils-ping procps telnet \ 
         wireguard \
+        lsb-release \        
         cargo                    
+
 
 # Add cloudflare gpg key
 RUN curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
 # Add this repo to your apt repositories
 RUN echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
-RUN type /etc/apt/sources.list.d/cloudflare-client.list
+
 # Install
-#RUN apt-get update && apt-get install cloudflare-warp
+RUN apt-get update && apt-get install -y cloudflare-warp
 
 # install cloudflare-warp client
 #RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg 

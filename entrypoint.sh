@@ -1,3 +1,4 @@
+ip link add dev wg0 type wireguard
 #!/bin/bash
 
 # exit when any command fails
@@ -44,10 +45,10 @@ warp-cli status --accept-tos &
 #wg setconf wg0 /var/app/wg.conf
 #ip link set up dev wg0
 
-#ip link add dev wg0 type wireguard
-#ip address add dev wg0 192.168.242.1/32
-#wg setconf wg0 /var/app/wg.conf
-#ip link set up dev wg0
+ip link add dev wg0 type wireguard
+ip address add dev wg0 192.168.0.24/32
+wg setconf wg0 /var/app/wg.conf
+ip link set up dev wg0
 
 ##############################################
 # setting api-server and WebUI-server
