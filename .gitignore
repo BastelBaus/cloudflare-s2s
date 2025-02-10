@@ -6,3 +6,4 @@
 **/*.pyc
 
 config.json
+*.code-workspace
