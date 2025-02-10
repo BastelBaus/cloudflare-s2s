@@ -9,7 +9,7 @@ import json
 
 from cloudflared import warp_cli
 from wireguard import wireguard
-from network import network
+import network
 
 logger = logging.getLogger(__name__)
 
@@ -19,7 +19,8 @@ logger = logging.getLogger(__name__)
 #logger.debug("debug !!! ")
 #logging.basicConfig(level=logging.DEBUG)
 
-
+_BUILD_DATE_FILE = "/build-date.txt"
+_VERSION = "0.1"
 
 api_port = os.environ['API_PORT']
 webui_port = os.environ['WEBUI_PORT']
@@ -32,7 +33,6 @@ print(f"{tunnel_token=}")
 
 warpcli = warp_cli(tunnel_token)
 wg = wireguard()
-net = network()
 
 
 app = Flask(__name__)
@@ -58,65 +58,85 @@ def api() -> str:
 #flask --app ./server/main run -p $API_PORT &
 
 @app.get('/api/html')
-def api_html():
+def api_html() -> str:
     list_of_aps = [f'<a href="http://localhost:{api_port}{ap}"> {ap} </a>' for ap in get_api_list()]
     str_of_aps  = "<br>\n".join(list_of_aps)
     return str_of_aps + "<br>\n"
 
+
 @app.get("/version")
 def version() -> str:    
-    ret_str
+    return _VERSION
+
+@app.get("/builddate")
+def builddate() -> str:    
+    with open(_BUILD_DATE_FILE, "r") as file:
+        ret_str = file.read()
     return ret_str
 
 
 
 ###########################################################
-# cloudflare warp-cli
+# cloudflare warp-cli 
 ###########################################################
 
 @app.get('/warp/status')
-def get_incomes():
+def get_incomes() -> str:
     return warpcli.get_status()
 
 @app.get('/warp/connect')
-def connect():
+def connect() -> str:
     return warpcli.connect()
 
 @app.get('/warp/disconnect')
-def disconnect():
+def disconnect() -> str:
     return warpcli.disconnect()
 
+
 @app.get('/warp/connector/new')
-def new_connector():
+def new_connector() -> str:
     tunnel_token = request.args.get('tunnel_token')
     logger.warn(f"{tunnel_token}") 
     return warpcli.new_connector(tunnel_token)
 
 @app.get('/warp/registration/show')
-def show_registration():    
+def show_registration() -> str:
     return warpcli.show_registration()
 
 @app.get('/warp/registration/delete')
-def delete_registration():    
+def delete_registration() -> str:
     return warpcli.delete_registration()
 
 @app.get('/warp/registration/organization')
-def show_organization():    
+def show_organization() -> str:
     return warpcli.show_organization()
 
 @app.get('/warp/settings')
-def settings():    
+def settings() -> str:
     return warpcli.settings()
 
 @app.get('/warp/debug/network')
-def debug_network():    
+def debug_network() -> str: 
     return warpcli.debug_network()
 
 @app.get('/warp/debug/dex')
-def debug_dex():    
+def debug_dex() -> str:
     return warpcli.debug_dex()
 
 
+@app.get('/warp/tunnel/ip')
+def tunnel_ip() -> str:
+    return warpcli.tunnel_ip()
+
+@app.get('/warp/tunnel/stats')
+def tunnel_stats() -> str:
+    return warpcli.tunnel_stats()
+
+@app.get('/warp/vnet')
+def vnet() -> str:
+    return warpcli.vnet()
+
+    
 
 ###########################################################
 # The wireguard interface
@@ -143,7 +163,7 @@ def get_publickey():
 @app.get('/net/interfaces')
 def get_interfaces():    
     #y = json.loads(x)
-    return net.get_interfaces()
+    return network.get_interfaces()
 
 
 

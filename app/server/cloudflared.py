@@ -8,12 +8,16 @@ import time
 import uuid
 import json
 
+import logging
+import network
+
+logger = logging.getLogger(__name__)
 
 class warp_cli:
 	
     
     #################################################################
-    # Initialization and general functions
+    # Initialization 
     #################################################################
     
     def __init__(self,tunnel_token : str|None = None):
@@ -29,6 +33,10 @@ class warp_cli:
         self.async_proc  = None
         #print(f"created cloudflare instance with uuid: {self.uuid}")
         
+    #################################################################
+    # Direct interface to the warp client
+    #################################################################
+
     def get_status(self):
         #return self.__call_cloudflared('--accept-tos --json status')
         return self.__call_cloudflared('status')
@@ -68,7 +76,16 @@ class warp_cli:
 
     def debug_dex(self):
         return self.__call_cloudflared('debug dex')            
-        
+
+    def tunnel_ip(self):
+        return self.__call_cloudflared('tunnel ip list')       
+
+    def tunnel_stats(self):
+        return self.__call_cloudflared('tunnel stats')       
+
+    def vnet(self):
+        return self.__call_cloudflared('vnet')       
+
     #################################################################
     # Private functions to handle the communication over the shell
     #################################################################
@@ -77,11 +94,12 @@ class warp_cli:
         ''' calls cloudflared with given arguments and returns the output as string '''
         #cmd = f"warp-cli {argument}"
         cmd = f"warp-cli -j --accept-tos {argument}"
-        print(f"call: {cmd}")
+        logger.info(f"cmd: {cmd}")
         stream = os.popen(cmd)
         output = stream.read()
-        print(f"returned:\n{output}")
-        return output
+        logger.info(f"returned:\n{output}")
+
+        return json.loads(output)
 
     def __call_cloudflared_async(self,argument:str) -> None :
         ''' calls cloudflared with given arguments and returns the output as string '''
@@ -101,7 +119,54 @@ class warp_cli:
             self.queue.put(line)
 
 
+    #################################################################
+    # Functions to get more information 
+    #################################################################
+
+    def estimate_own_subnet(self) -> str:
+        ''' Try to estimate the subnet of the own adapter.
+            ping all possible subnets and check for which subnet
+            nftables did not use CloudflareWARP adapter.
+        '''
+        own_subnet = ''
+        tunnels = self.tunnel_ip()
+        try:
+            is_cloudflare = [0] * len(tunnels['routes'])
+            for i,tunnel in enumerate(tunnels['routes']):
+                ip = tunnel['value'].split('/')[0]
+                ip_parts = ip.split('.')
+                ip_parts[3]= '1' # TODO: change to +1!
+                ip = '.'.join(ip_parts)
+                route_to = network.get_route_to(ip)
+                tunnel = [a for a in route_to if a['dev']=='CloudflareWARP' ]
+                if len(tunnel)>0: continue # this is cloudflare !
+                # the the first non cloud flare!
+                own_subnet = route_to[0]["prefsrc"]
+            return ''
+            # there should be only one none cloudflare tunnel,
+            # this is the subnet of this adapter
+
+        except: # TODO, catch only specific exceptions !!
+            pass
+            
+        return own_subnet
+
+
+    def get_interface_ip(self) -> str:
+        ''' returns the internal IP of the cloudflare interface as string. '''
+        interfaces = network.get_interfaces()
+        if not isinstance(interfaces,list): interfaces = [interfaces]
+        try:
+            ip = [a for a in d if a['ifname']=='CloudflareWARP' ][0]['addr_info'][0]
+            ip = ip['local'] + '/' + str(ip['prefixlen'])
+        except:
+            ip = ''
+        return ip
+        
+
+
     
+
     
     
     

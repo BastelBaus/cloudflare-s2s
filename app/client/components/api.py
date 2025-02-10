@@ -27,18 +27,56 @@ import requests
 #    counter('A')
 #    counter('B')
 
+from urllib3.exceptions import (ConnectTimeoutError, MaxRetryError,
+                                NewConnectionError, SSLError,
+                                ReadTimeoutError)
+#from nicegui import background_tasks
+#background_tasks.create(  )
+# TODO: if API call is verys slow, what to do then
+                   
+def call_api(api_url:str) -> tuple[bool,str]:
+    try:
+        response = requests.get(api_url)
+        status   = (response.status_code == 200)
+        result   = response
+    except MaxRetryError as error:        
+        print('MaxRetryError', error.__str__())
+        status = False
+        result = error.__str__()
+    except NewConnectionError as error:
+        print('NewConnectionError', error.__str__())
+        status = False
+        result = error.__str__()
+    except ConnectTimeoutError as error:
+        print('ConnectTimeoutError', error.__str__())
+        status = False
+        result = error.__str__()
+    except SSLError as error:
+        print('SSLError', error.__str__())
+        status = False
+        result = error.__str__()
+    except ReadTimeoutError as error:
+        print('ReadTimeoutError', error.__str__())
+        status = False
+        result = error.__str__()
+        
+    return  status, result
+
 def do_api_call(api,set_result):
-    x = requests.get(api)
-    set_result(x.text)
+    status,result = call_api(api)
+    if status: set_result(result.text)
+    else: set_result(result)
 
 @ui.refreshable
-def api_call(api: str):
+def do_api_call_ui(api: str):
     with ui.card():
         result, set_result = ui.state('none')
         ui.button(f'{api}', on_click=lambda: do_api_call(api,set_result))
         ui.label(f'{result}')
 
 
+
+ 
 
 def content() -> None:
 
@@ -59,11 +97,14 @@ def content() -> None:
         base_url = "http://localhost:15650/"
         base_url = "http://192.168.0.23:15651/"
         api_url = base_url + "api"
-        response = requests.get(api_url)
+        status, response = call_api(api_url)
+        if not status: 
+            ui.label(response)
+            return
         for api_point in response.json():
             with ui.row():
                 api = base_url+api_point
-                api_call(api)
+                do_api_call_ui(api)
                 #with ui.column():
                     #ui.label(api)
                     #api_call_result("none")

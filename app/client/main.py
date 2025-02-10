@@ -10,7 +10,7 @@ from nicegui import app, ui
 # Nice starter: https://github.com/frycodelab/nicegui-component-based/tree/main
 
 
-appName = "cloudflare-s2s", 
+appName = "cloudflare-s2s"
 appVersion = "0.1"
 #appPort = 15650
 appPort = 8080
@@ -61,7 +61,7 @@ def index():
 
                 with ui.tab_panel('tab_4').style('font-family: "Rational Display", sans-serif;'):
                     components.api.content()
-
+                    
         header_below.tailwind("pt-16")
         tab_panel.tailwind("pt-16 pl-16 pr-16")
 
@@ -73,9 +73,7 @@ def handle_shutdown():
 
 app.on_shutdown(handle_shutdown)
 
-print("Guid Version 42")
-
 #For dev
 ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon='🚀')
 
-print("Scriupt ended")
+print("cloudflare-s2s script ended")

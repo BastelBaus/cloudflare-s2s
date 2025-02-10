@@ -1,8 +1,8 @@
 # syntax=docker/dockerfile:1
 
 #FROM docker.io/library/debian:bookworm-slim
-#FROM python:3.13-slim-bookworm
-FROM python:3.21-alpine
+FROM python:3.13-slim-bookworm
+#FROM alpine:3.21
 
 ENV WARP_SLEEP=2
 ENV WEBUI_PORT=15650
@@ -36,28 +36,22 @@ VOLUME /var/data/wireguard/
 # install general packages
 RUN apt-get update
 RUN </dev/null DEBIAN_FRONTEND=noninteractive
-RUN apt-get --yes install --no-install-recommends  \
-        curl gpg ca-certificates dbus \
-        cron tcpdump iputils-ping procps telnet \ 
-        wireguard \
-        lsb-release \        
-        cargo                    
+#RUN apt-get --yes install --no-install-recommends cargo                    
+
+# install some tools for net monitoring
+RUN apt-get --yes install --no-install-recommends \
+     curl cron tcpdump iputils-ping procps telnet mtr
+
+# install wireguard
+RUN apt-get --yes install --no-install-recommends  wireguard
 
 
-# Add cloudflare gpg key
+# Install cloudflare 
+RUN apt-get --yes install --no-install-recommends gpg ca-certificates dbus 
+RUN apt-get --yes install --no-install-recommends lsb-release         
 RUN curl -fsSL https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg
-# Add this repo to your apt repositories
 RUN echo "deb [signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ $(lsb_release -cs) main" | tee /etc/apt/sources.list.d/cloudflare-client.list
-
-# Install
 RUN apt-get update && apt-get install -y cloudflare-warp
-
-# install cloudflare-warp client
-#RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg 
-#RUN /usr/bin/curl https://pkg.cloudflareclient.com/pubkey.gpg | gpg --yes --dearmor --output /usr/share/keyrings/cloudflare-warp-archive-keyring.gpg 
-#RUN echo "deb [arch=amd64 signed-by=/usr/share/keyrings/cloudflare-warp-archive-keyring.gpg] https://pkg.cloudflareclient.com/ bookworm main" | tee /etc/apt/sources.list.d/cloudflare-client.list 
-#RUN apt-get update &&  apt-get --yes install cloudflare-warp 
-
 
 # clean the install
 RUN apt-get clean
