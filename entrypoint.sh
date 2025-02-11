@@ -3,12 +3,12 @@
 # exit when any command fails
 #set -e
 
-printf "\n---------------------------------------------"
-printf "Starting entry into container"
-printf "Image built: $(cat /build-date.txt)"
+echo "\n---------------------------------------------"
+echo "Starting entry into container"
+echo "Image built: $(cat /build-date.txt)"
 
-printf "\n---------------------------------------------"
-printf "Setting up warp"
+echo "\n---------------------------------------------"
+echo "Setting up warp"
 
 ##############################################
 # setting up the cloudflare tunnel
@@ -44,25 +44,27 @@ warp-cli --accept-tos status &
 # setting up the wireguad tunnel
 ##############################################
 
-printf "\n---------------------------------------------"
-printf "Setting up wireguard"
+echo ""
+echo "---------------------------------------------"
+echo "Setting up wireguard"
 
 #ip link add dev wg0 type wireguard
 #ip address add dev wg0 $CDIR_WG
 #wg setconf wg0 /var/app/wg.conf
 #ip link set up dev wg0
 
-ip link add dev wg0 type wireguard
-ip address add dev wg0 192.168.0.24/32
-wg setconf wg0 /var/app/wg.conf
-ip link set up dev wg0
+#ip link add dev wg0 type wireguard
+#ip address add dev wg0 192.168.0.24/32
+#wg setconf wg0 /var/app/wg.conf
+#ip link set up dev wg0
 
 ##############################################
 # setting api-server and WebUI-server
 ##############################################
 
-printf "\n---------------------------------------------"
-printf "starting the backend and frontend servers"
+echo ""
+echo "---------------------------------------------"
+echo "starting the backend and frontend servers"
 
 
 export FLASK_APP=/var/app/server/main.py 
@@ -73,10 +75,12 @@ python /var/app/client/main.py &
 #flask --app ./server/main run -p $API_PORT &
 #flask --app ./client/main run -p $WEBUI_PORT &
 
-printf "\n---------------------------------------------"
-printf "initialization finished:"
-printf " API at port localhost:$API_PORT"
-printf " WebUI at port localhost:$WEBUI_PORT"
+echo ""
+echo "---------------------------------------------"
+echo "initialization finished:"
+echo " API at port localhost:$API_PORT"
+echo " WebUI at port localhost:$WEBUI_PORT"
+echo "---------------------------------------------"
 
 ##############################################
 # done, sleep until forever

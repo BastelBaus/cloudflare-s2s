@@ -98,8 +98,8 @@ class warp_cli:
         stream = os.popen(cmd)
         output = stream.read()
         logger.info(f"returned:\n{output}")
-
-        return json.loads(output)
+        if len(output)>0: return json.loads(output)
+        else:             return {}
 
     def __call_cloudflared_async(self,argument:str) -> None :
         ''' calls cloudflared with given arguments and returns the output as string '''
@@ -123,6 +123,7 @@ class warp_cli:
     # Functions to get more information 
     #################################################################
 
+
     def estimate_own_subnet(self) -> str:
         ''' Try to estimate the subnet of the own adapter.
             ping all possible subnets and check for which subnet
@@ -130,20 +131,26 @@ class warp_cli:
         '''
         own_subnet = ''
         tunnels = self.tunnel_ip()
+        logger.info(f"Tunnels: {tunnels}")
         try:
             is_cloudflare = [0] * len(tunnels['routes'])
             for i,tunnel in enumerate(tunnels['routes']):
+                logger.info(f"{i} : {tunnel}")
                 ip = tunnel['value'].split('/')[0]
                 ip_parts = ip.split('.')
                 ip_parts[3]= '1' # TODO: change to +1!
                 ip = '.'.join(ip_parts)
+                logger.info(f"ip -->  {ip}")
                 route_to = network.get_route_to(ip)
-                tunnel = [a for a in route_to if a['dev']=='CloudflareWARP' ]
-                if len(tunnel)>0: continue # this is cloudflare !
+                logger.info(f"route -->  {route_to}")
+                dev = [a for a in route_to if a['dev']=='CloudflareWARP' ]
+                if len(dev)>0: continue # this is cloudflare !
+                own_subnet = tunnel['value']                
+                # tunnel['description']
+                break # there should be only one none cloudflare tunnel,
+                
                 # the the first non cloud flare!
-                own_subnet = route_to[0]["prefsrc"]
-            return ''
-            # there should be only one none cloudflare tunnel,
+                #own_subnet = route_to[0]["prefsrc"]
             # this is the subnet of this adapter
 
         except: # TODO, catch only specific exceptions !!
@@ -155,10 +162,13 @@ class warp_cli:
     def get_interface_ip(self) -> str:
         ''' returns the internal IP of the cloudflare interface as string. '''
         interfaces = network.get_interfaces()
+        logger.info(f"interfaces: {interfaces}")
         if not isinstance(interfaces,list): interfaces = [interfaces]
         try:
-            ip = [a for a in d if a['ifname']=='CloudflareWARP' ][0]['addr_info'][0]
+            ip = [a for a in interfaces if a['ifname']=='CloudflareWARP' ][0]['addr_info'][0]
+            logger.info(f"ip: {ip}")
             ip = ip['local'] + '/' + str(ip['prefixlen'])
+            logger.info(f"ip: {ip}")
         except:
             ip = ''
         return ip

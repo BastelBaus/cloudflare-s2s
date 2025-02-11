@@ -31,3 +31,6 @@ ip link add cf-s2s link eth0 type macvlan mode bridge
 ip addr add 192.168.0.24/32 dev cf-s2s
 ip link set cf-s2s up
 ip route add 192.168.0.228/32 dev cf-s2s
+
+
+git config --global core.autocrlf false

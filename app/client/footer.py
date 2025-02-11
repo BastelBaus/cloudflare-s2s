@@ -15,3 +15,5 @@ def frame(title: str, version : str):
             ui.icon('eva-github', color="white").classes('text-5xl')
             ui.tooltip("Got GitHub repo @frycodelab")
         ui.space()
+
+        # https://dash.cloudflare.com/
