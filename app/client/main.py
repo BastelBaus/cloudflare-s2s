@@ -12,18 +12,24 @@ from nicegui import app, ui
 import logging
 logger = logging.getLogger(__name__)
 
-logging.basicConfig(
-    level=logging.INFO,
-    format="frontend %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
-    stream=sys.stdout)
+#logging.basicConfig(
+#    level=logging.INFO,
+#    format="frontend %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+#    stream=sys.stdout)
 
+import pathlib
+CUR_DIR = pathlib.Path(__file__).parent.resolve()
 
+_DEFAULT_WEB_PORT = 8080
 appName = "cloudflare-s2s"
 appVersion = "0.1"
-appPort = int(os.environ['WEBUI_PORT'])
-#appPort = 8080
 
+if  'WEBUI_PORT' in os.environ.keys():
+      appPort = int(os.environ['WEBUI_PORT'])
+else: appPort = _DEFAULT_WEB_PORT
 
+print(f'\n\n{CUR_DIR}/assets\n\n')
+app.add_static_files("/assets",f'{CUR_DIR}/assets')
 
 # Nice starter: https://github.com/frycodelab/nicegui-component-based/tree/main
 
@@ -31,6 +37,10 @@ appPort = int(os.environ['WEBUI_PORT'])
 @ui.page('/')
 def index():
 
+<<<<<<< HEAD
+=======
+
+>>>>>>> 40dc7edeb975a4c9539ba3b8488e1a7e68d5396f
     ui.colors(primary='#28323C', secondary="#B4C3AA", positive='#53B689', accent='#111B1E')
     #ui.add_head_html("<style>" + open(Path(__file__).parent / "assets" / "css" / "global-css.css").read() + "</style>")
 
@@ -74,23 +84,29 @@ def index():
 
                 with ui.tab_panel('tab_4').style('font-family: "Rational Display", sans-serif;'):
                     components.api.content()
+<<<<<<< HEAD
                     
+=======
+                                        
+>>>>>>> 40dc7edeb975a4c9539ba3b8488e1a7e68d5396f
         header_below.tailwind("pt-16")
         tab_panel.tailwind("pt-16 pl-16 pr-16")
 
         footer.frame(title=appName, version=appVersion)
 
 def handle_shutdown():
-    print('Shutdown has been initiated!')
+    logger.info(f"Ending cloudflare-s2s frontend server ")
+
+app.on_shutdown(handle_shutdown)
 
 
-if __name__ in {"__main__", "__mp_main__"}:
 
+#ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon="/assets/images/favicon.ico") 
+ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon="🚀") 
+
+
+if __name__=="__main__":
     logger.info("\n------------------------------------------------")
     logger.info(f"Starting cloudflare-s2s frontend server @ port:{appPort}")
 
-    app.on_shutdown(handle_shutdown)
-    #For dev
-    ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon='🚀')
 
-    logger.info("cloudflare-s2s frontend server ended")

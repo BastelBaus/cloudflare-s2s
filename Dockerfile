@@ -62,7 +62,7 @@ EXPOSE ${API_PORT}
 # copy application and entry point data
 COPY ./app/client /var/app/client
 COPY ./app/server /var/app/server
-#COPY ./entrypoint.sh  .
+COPY ./app/wg.conf .
 COPY --chmod=755 ./entrypoint.sh  .
 COPY ./entrypoint.sh  .
 RUN ["chmod", "+x", "./entrypoint.sh"]

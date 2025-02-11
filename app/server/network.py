@@ -20,6 +20,11 @@ def __call_command(cmd:str) -> dict:
     stream = os.popen(cmd)
     output = stream.read()
     logger.info(f"returned:\n{output}")
+<<<<<<< HEAD
     return json.loads(output)
+=======
+    if len(output)>0: return json.loads(output)
+    else:             return {}
+>>>>>>> 40dc7edeb975a4c9539ba3b8488e1a7e68d5396f
     
 

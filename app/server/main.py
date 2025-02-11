@@ -36,18 +36,18 @@ warpcli = warp_cli(tunnel_token)
 wg = wireguard()
 
 logger.info("\n------------------------------------------------")
-logger.info(f"starting backend server at port:{api_port=}")
+logger.info(f"starting backend server at port:{api_port}")
 logger.info(f"tunnel_token: {tunnel_token}")
 
 app = Flask(__name__)
 
 ###########################################################
-# general  things
+# general things
 ###########################################################
 
 @app.get("/")
 def main() -> str:    
-    ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!\nlink to a list of access points: <a href="/api/html">api</a></body></html>'
+    ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!<br>Link to a list of access points: <a href="/api/html">api</a></body></html>'
     return ret_str 
 
 def get_api_list() -> str:
@@ -58,8 +58,6 @@ def get_api_list() -> str:
 @app.get('/api')
 def api() -> str:
     return get_api_list()
-    
-#flask --app ./server/main run -p $API_PORT &
 
 @app.get('/api/html')
 def api_html() -> str:
@@ -140,7 +138,14 @@ def tunnel_stats() -> str:
 def vnet() -> str:
     return warpcli.vnet()
 
+@app.get('/warp/interface/ip')
+def interface_ip() -> str:
+    return warpcli.get_interface_ip()
     
+@app.get('/warp/interface/mysubnet')
+def interface_mysubnet() -> str:
+    return warpcli.estimate_own_subnet()
+ 
 
 ###########################################################
 # The wireguard interface

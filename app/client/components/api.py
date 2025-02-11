@@ -94,10 +94,13 @@ def content() -> None:
 
         #ui.link('http://localhost:15650/api','http://localhost:15650/api')
 
-        base_url = "http://localhost:15650/"
+        base_url = "http://localhost:15651/"
         #base_url = "http://192.168.0.23:15651/"
         api_url = base_url + "api"
         status, response = call_api(api_url)
+        #print(status)
+        #print(response.json())
+        
         if not status: 
             ui.label(response)
             return
