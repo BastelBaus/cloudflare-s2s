@@ -1,4 +1,4 @@
-# syntax=docker/dockerfile:1
+# syntax=docker/dockerfile:1.2
 
 #FROM docker.io/library/debian:bookworm-slim
 FROM python:3.13-slim-bookworm
@@ -13,19 +13,13 @@ ENV FLASK_RUN_HOST=0.0.0.0
 ENV TUNNEL_TOKEN=${TUNNEL_TOKEN:-""}
 ENV CDIR_WG=192.168.242.1/24
 
-RUN date +%Y%m%d > /build-date.txt
+RUN date >/build-date.txt
 
 #ENV VERSION=$CLOUDFLARED_VERSION
 
 # General settings
 USER root
 WORKDIR /var/app
-
-# copy application and entry point data
-COPY ./app .
-COPY --chmod=755 ./entrypoint.sh  .
-RUN ["chmod", "+x", "./entrypoint.sh"]
-
 
 # the volume to store the wireguad configuration
 VOLUME /var/data/wireguard/ 
@@ -58,14 +52,21 @@ RUN apt-get clean
 RUN rm -rf /var/lib/apt/lists/*
 
 # setting up the python environment
-#RUN pip install -r /var/app/requirements.txt
+COPY ./app/requirements.txt /var/app
 RUN pip install -r ./requirements.txt
 
 
 EXPOSE ${WEBUI_PORT}
 EXPOSE ${API_PORT}
 
-RUN date >/build-date.txt
+# copy application and entry point data
+COPY ./app/client /var/app/client
+COPY ./app/server /var/app/server
+#COPY ./entrypoint.sh  .
+COPY --chmod=755 ./entrypoint.sh  .
+COPY ./entrypoint.sh  .
+RUN ["chmod", "+x", "./entrypoint.sh"]
+
 
 #CMD ["flask", "--app", "./server/main", "run","-p", "5000"]
 #CMD ["echo", "Docker setup finished"]

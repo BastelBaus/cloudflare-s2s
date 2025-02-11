@@ -1,0 +1,5 @@
+* set firewall rules that webui & xx port are only available over default network
+* we do not neetd to publish the wireguard port
+
+* functiuon to show warpü-svc log in the gui
+   * should we make this a rotating log ??

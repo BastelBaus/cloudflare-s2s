@@ -10,7 +10,7 @@ logger = logging.getLogger(__name__)
 def get_route_to(addr:str) -> str:
     return __call_command("ip --json route get {addr}")
 
-def get_interfaces(self) -> str:
+def get_interfaces() -> str:
     return __call_command("ip  -j -br address")
    
 

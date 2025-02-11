@@ -35,8 +35,9 @@ services:
       - net.ipv6.conf.all.disable_ipv6=1
 #      - net.ipv4.conf.all.src_valid_mark=1
     networks:
+      default:        
       macvlan_network:
-        ipv4_address: 192.168.0.23
+        ipv4_address: ${ROUTER_IP}
 
 networks:
   macvlan_network:
@@ -46,10 +47,9 @@ networks:
     ipam:
       driver: default
       config:
-       - subnet: 192.168.0.0/24
+       - subnet: ${SUBNET}
 #         ip_range: 192.168.1.23/32
-         gateway: 192.168.0.1
-
+         gateway: ${GATEWAY_IP}
 
 
 

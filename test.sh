@@ -3,12 +3,7 @@
 # exit when any command fails
 #set -e
 
-printf "\n---------------------------------------------"
-printf "Starting entry into container"
-printf "Image built: $(cat /build-date.txt)"
-
-printf "\n---------------------------------------------"
-printf "Setting up warp"
+#echo "Image built: $(cat /build-date.txt)"
 
 ##############################################
 # setting up the cloudflare tunnel
@@ -30,7 +25,7 @@ fi
 dbus-daemon --config-file=/usr/share/dbus-1/system.conf
 
 # start the daemon
-warp-svc --accept-tos > /warp-svc.log &
+warp-svc --accept-tos &
 
 # sleep to wait for the daemon to start, default 2 seconds
 sleep "$WARP_SLEEP"
@@ -38,14 +33,11 @@ sleep "$WARP_SLEEP"
 # to this top accept the terms & conditions
 # since --accept-tos does nto work reliable
 #echo "y" | warp-cli status 
-warp-cli --accept-tos status &
+warp-cli status --accept-tos &
 
 ##############################################
 # setting up the wireguad tunnel
 ##############################################
-
-printf "\n---------------------------------------------"
-printf "Setting up wireguard"
 
 #ip link add dev wg0 type wireguard
 #ip address add dev wg0 $CDIR_WG
@@ -61,22 +53,13 @@ ip link set up dev wg0
 # setting api-server and WebUI-server
 ##############################################
 
-printf "\n---------------------------------------------"
-printf "starting the backend and frontend servers"
+flask --app ./server/main run -p $API_PORT &
+flask --app ./client/main run -p $WEBUI_PORT &
 
-
-export FLASK_APP=/var/app/server/main.py 
-echo   ${FLASK_APP}
-python -m flask run -p $API_PORT &
-python /var/app/client/main.py &
-
-#flask --app ./server/main run -p $API_PORT &
-#flask --app ./client/main run -p $WEBUI_PORT &
-
-printf "\n---------------------------------------------"
-printf "initialization finished:"
-printf " API at port localhost:$API_PORT"
-printf " WebUI at port localhost:$WEBUI_PORT"
+echo "Service started:"
+echo " API at port $API_PORT"
+echo " WebUI at port $WEBUI_PORT"
+#echo " TOKEN: $TUNNEL_TOKEN"
 
 ##############################################
 # done, sleep until forever

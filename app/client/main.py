@@ -4,16 +4,29 @@ import components.api
 import components.home_content
 import components.controls_content
 import components.data_content
+import sys
+import os
 
 from nicegui import app, ui
 
-# Nice starter: https://github.com/frycodelab/nicegui-component-based/tree/main
+import logging
+logger = logging.getLogger(__name__)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="frontend %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+    stream=sys.stdout)
 
 
 appName = "cloudflare-s2s"
 appVersion = "0.1"
-#appPort = 15650
-appPort = 8080
+appPort = int(os.environ['WEBUI_PORT'])
+#appPort = 8080
+
+
+
+# Nice starter: https://github.com/frycodelab/nicegui-component-based/tree/main
+
 
 @ui.page('/')
 def index():
@@ -71,9 +84,13 @@ def handle_shutdown():
     print('Shutdown has been initiated!')
 
 
-app.on_shutdown(handle_shutdown)
+if __name__ in {"__main__", "__mp_main__"}:
 
-#For dev
-ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon='🚀')
+    logger.info("\n------------------------------------------------")
+    logger.info(f"Starting cloudflare-s2s frontend server @ port:{appPort}")
 
-print("cloudflare-s2s script ended")
+    app.on_shutdown(handle_shutdown)
+    #For dev
+    ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon='🚀')
+
+    logger.info("cloudflare-s2s frontend server ended")

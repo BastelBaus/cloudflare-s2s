@@ -3,6 +3,7 @@
 
 from flask import Flask, request 
 import os
+import sys
 import logging
 import json
 
@@ -13,6 +14,12 @@ import network
 
 logger = logging.getLogger(__name__)
 
+logging.basicConfig(
+    level=logging.INFO,
+    format="backend %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+    stream=sys.stdout)
+
+
 #logger.error("error !!! ")
 #logger.warn("warn !!! ")
 #logger.info("info !!! ")
@@ -22,18 +29,15 @@ logger = logging.getLogger(__name__)
 _BUILD_DATE_FILE = "/build-date.txt"
 _VERSION = "0.1"
 
-api_port = os.environ['API_PORT']
-webui_port = os.environ['WEBUI_PORT']
+api_port = int(os.environ['API_PORT'])
 tunnel_token = os.environ['TUNNEL_TOKEN']
-
-print(f"{api_port=}")
-print(f"{webui_port=}")
-print(f"{tunnel_token=}")
-
 
 warpcli = warp_cli(tunnel_token)
 wg = wireguard()
 
+logger.info("\n------------------------------------------------")
+logger.info(f"starting backend server at port:{api_port=}")
+logger.info(f"tunnel_token: {tunnel_token}")
 
 app = Flask(__name__)
 
@@ -43,7 +47,7 @@ app = Flask(__name__)
 
 @app.get("/")
 def main() -> str:    
-    ret_str = 'Welcome to bastelbaus cloudflared-s2s!\nlink to <a href="/api">api</s> '
+    ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!\nlink to a list of access points: <a href="/api/html">api</a></body></html>'
     return ret_str 
 
 def get_api_list() -> str:
