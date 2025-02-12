@@ -36,11 +36,7 @@ app.add_static_files("/assets",f'{CUR_DIR}/assets')
 
 @ui.page('/')
 def index():
-
-<<<<<<< HEAD
-=======
-
->>>>>>> 40dc7edeb975a4c9539ba3b8488e1a7e68d5396f
+    
     ui.colors(primary='#28323C', secondary="#B4C3AA", positive='#53B689', accent='#111B1E')
     #ui.add_head_html("<style>" + open(Path(__file__).parent / "assets" / "css" / "global-css.css").read() + "</style>")
 
@@ -84,11 +80,7 @@ def index():
 
                 with ui.tab_panel('tab_4').style('font-family: "Rational Display", sans-serif;'):
                     components.api.content()
-<<<<<<< HEAD
-                    
-=======
-                                        
->>>>>>> 40dc7edeb975a4c9539ba3b8488e1a7e68d5396f
+
         header_below.tailwind("pt-16")
         tab_panel.tailwind("pt-16 pl-16 pr-16")
 

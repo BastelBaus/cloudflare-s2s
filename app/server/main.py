@@ -29,7 +29,10 @@ logging.basicConfig(
 _BUILD_DATE_FILE = "/build-date.txt"
 _VERSION = "0.1"
 
-api_port = int(os.environ['API_PORT'])
+if 'API_PORT' in os.environ.keys():
+      api_port = int(os.environ['API_PORT'])
+else: api_port = '15651'
+
 tunnel_token = os.environ['TUNNEL_TOKEN']
 
 warpcli = warp_cli(tunnel_token)
@@ -167,11 +170,14 @@ def get_publickey():
 # The general network
 ###########################################################
 
+@app.get('/net/check_open_ports')
+def check_open_ports():    
+    return network.check_open_ports()
+
 
 
 @app.get('/net/interfaces')
 def get_interfaces():    
-    #y = json.loads(x)
     return network.get_interfaces()
 
 
