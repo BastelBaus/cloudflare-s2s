@@ -1,6 +1,7 @@
 import header
 import footer
-import components.api
+import components.api_content
+import components.sites_content
 import components.home_content
 import components.controls_content
 import components.data_content
@@ -36,7 +37,7 @@ app.add_static_files("/assets",f'{CUR_DIR}/assets')
 
 @ui.page('/')
 def index():
-    
+
     ui.colors(primary='#28323C', secondary="#B4C3AA", positive='#53B689', accent='#111B1E')
     #ui.add_head_html("<style>" + open(Path(__file__).parent / "assets" / "css" / "global-css.css").read() + "</style>")
 
@@ -47,7 +48,12 @@ def index():
 
                 with ui.tabs().props("active-color=blue-grey-14 active-bg-color=white") as tabs1:
                     
+                    # check database: https://fonts.google.com/icons
                     with ui.row():
+
+                        with ui.tab("tab_sites", label="").style('color: black; font-family: "Rational Display", sans-serif;').props("no-caps") as tab_two:
+                            ui.icon("o_home").classes('text-3xl')
+                            ui.label("sites")
 
                         with ui.tab("tab_1", label="").style('color: black; font-family: "Rational Display", sans-serif;').props("no-caps") as tab_three:
                             ui.icon("o_home").classes('text-3xl')
@@ -66,7 +72,8 @@ def index():
                             ui.label("API")
 
 
-        with ui.tab_panels(tabs1, value='tab_1').classes('w-full') as tab_panel:
+
+        with ui.tab_panels(tabs1, value='tab_sites').classes('w-full') as tab_panel:
 
                 with ui.tab_panel('tab_1').style('font-family: "Rational Display", sans-serif;'):
                     components.home_content.content()
@@ -79,7 +86,11 @@ def index():
                     components.data_content.content()
 
                 with ui.tab_panel('tab_4').style('font-family: "Rational Display", sans-serif;'):
-                    components.api.content()
+                    components.api_content.content()
+                
+                with ui.tab_panel('tab_sites').style('font-family: "Rational Display", sans-serif;'):
+                    components.sites_content.content()
+
 
         header_below.tailwind("pt-16")
         tab_panel.tailwind("pt-16 pl-16 pr-16")

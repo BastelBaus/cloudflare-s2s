@@ -20,19 +20,28 @@ class config:
 
 
     def load(self):
-        ''' load teh current configuration from a file'''
+        ''' load the current configuration from a file'''
         with open(CONFIG_FILENAME, 'r') as file:
             self.data = json.load(file)
+        self._validate_and_correct()
 
     def store(self):
         ''' store the currenbt configuration to a file '''
         with open(CONFIG_FILENAME, 'w') as file:
             json.dump(self.data, file)
 
-
+    def _validate_and_correct(self):
+        if "version" not in self.data.keys(): self.data["version"] = VERSION
+        if "sites"   not in self.data.keys(): self.data["sites"] = []
+        for i in range(len(self.data["sites"])):
+            if "token"   not in self.data["sites"][i].keys(): self.data["sites"][i]["token"]   = ""
+            if "name"    not in self.data["sites"][i].keys(): self.data["sites"][i]["name"]    = ""
+            if "address" not in self.data["sites"][i].keys(): self.data["sites"][i]["address"] = ""
+            
+        
     @staticmethod
     def _default_config():
-        data = { 'version':VERSION }
+        data = { "version":VERSION }
         return data
 
 cfg = config()

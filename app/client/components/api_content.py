@@ -1,8 +1,10 @@
 from nicegui import ui, app
 
 from config import cfg
+#import api
+from api import apicall
+import json
 
-import requests
 #response.json()
 
 #@ui.refreshable
@@ -33,37 +35,10 @@ from urllib3.exceptions import (ConnectTimeoutError, MaxRetryError,
 #from nicegui import background_tasks
 #background_tasks.create(  )
 # TODO: if API call is verys slow, what to do then
-                   
-def call_api(api_url:str) -> tuple[bool,str]:
-    try:
-        response = requests.get(api_url)
-        status   = (response.status_code == 200)
-        result   = response
-    except MaxRetryError as error:        
-        print('MaxRetryError', error.__str__())
-        status = False
-        result = error.__str__()
-    except NewConnectionError as error:
-        print('NewConnectionError', error.__str__())
-        status = False
-        result = error.__str__()
-    except ConnectTimeoutError as error:
-        print('ConnectTimeoutError', error.__str__())
-        status = False
-        result = error.__str__()
-    except SSLError as error:
-        print('SSLError', error.__str__())
-        status = False
-        result = error.__str__()
-    except ReadTimeoutError as error:
-        print('ReadTimeoutError', error.__str__())
-        status = False
-        result = error.__str__()
-        
-    return  status, result
+
 
 def do_api_call(api,set_result):
-    status,result = call_api(api)
+    status,result = apicall(api)
     if status: set_result(result.text)
     else: set_result(result)
 
@@ -84,7 +59,7 @@ def content() -> None:
     #          value=color, on_change=lambda e: set_color(e.value))
 
     with ui.card().classes('w-full'):
-
+        
         #with ui.row():
         #    ui.icon("o_info").classes('text-xl')
 
@@ -97,14 +72,15 @@ def content() -> None:
         base_url = "http://localhost:15651/"
         #base_url = "http://192.168.0.23:15651/"
         api_url = base_url + "api"
-        status, response = call_api(api_url)
+        status, response = apicall(api_url)
         #print(status)
         #print(response.json())
         
         if not status: 
             ui.label(response)
             return
-        for api_point in response.json():
+        #for api_point in response.json():
+        for api_point in response:
             with ui.row():
                 api = base_url+api_point
                 do_api_call_ui(api)

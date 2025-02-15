@@ -8,7 +8,7 @@ import logging
 import json
 
 
-from cloudflared import warp_cli
+from cloudflare import warp_cli
 from wireguard import wireguard
 import network
 
@@ -44,6 +44,8 @@ logger.info(f"tunnel_token: {tunnel_token}")
 
 app = Flask(__name__)
 
+
+
 ###########################################################
 # general things
 ###########################################################
@@ -53,14 +55,14 @@ def main() -> str:
     ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!<br>Link to a list of access points: <a href="/api/html">api</a></body></html>'
     return ret_str 
 
-def get_api_list() -> str:
+def get_api_list() -> list:
     list_of_aps =  ['%s' % rule for rule in app.url_map.iter_rules()]
     list_of_aps.pop(0) # remove the static paths
     return list_of_aps
 
 @app.get('/api')
 def api() -> str:
-    return get_api_list()
+    return json.dumps(get_api_list())
 
 @app.get('/api/html')
 def api_html() -> str:
@@ -71,13 +73,13 @@ def api_html() -> str:
 
 @app.get("/version")
 def version() -> str:    
-    return _VERSION
+    return json.dumps({ "version":_VERSION })
 
 @app.get("/builddate")
 def builddate() -> str:    
     with open(_BUILD_DATE_FILE, "r") as file:
-        ret_str = file.read()
-    return ret_str
+        ret_str = file.read().strip()
+    return json.dumps({ "builddate":ret_str })
 
 
 
@@ -97,11 +99,14 @@ def connect() -> str:
 def disconnect() -> str:
     return warpcli.disconnect()
 
+@app.get('/warp/connector/get')
+def get_connector() -> str:
+    return {"token":warpcli.tunnel_token } 
 
 @app.get('/warp/connector/new')
 def new_connector() -> str:
     tunnel_token = request.args.get('tunnel_token')
-    logger.warn(f"{tunnel_token}") 
+    logger.info(f"Tunnel token form intertface: {tunnel_token}") 
     return warpcli.new_connector(tunnel_token)
 
 @app.get('/warp/registration/show')
@@ -143,11 +148,11 @@ def vnet() -> str:
 
 @app.get('/warp/interface/ip')
 def interface_ip() -> str:
-    return warpcli.get_interface_ip()
+    return { 'myip':warpcli.get_interface_ip()}
     
 @app.get('/warp/interface/mysubnet')
 def interface_mysubnet() -> str:
-    return warpcli.estimate_own_subnet()
+    return { 'mysubnet': warpcli.estimate_own_subnet() }
  
 
 ###########################################################

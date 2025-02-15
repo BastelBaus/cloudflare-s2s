@@ -3,3 +3,5 @@
 
 * functiuon to show warpü-svc log in the gui
    * should we make this a rotating log ??
+
+   allow only IP addresses (specific) for other sites ??? Or give warnuing
