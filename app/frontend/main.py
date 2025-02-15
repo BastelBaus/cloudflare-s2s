@@ -1,14 +1,21 @@
-import header
-import footer
-import components.api_content
-import components.sites_content
-import components.home_content
-import components.controls_content
-import components.data_content
+#
+#
+#
+###############################################################################
+# pylint: disable=logging-fstring-interpolation
+
 import sys
 import os
 
 from nicegui import app, ui
+
+from . import header
+from . import footer
+from .components import api_content
+from .components import sites_content
+from .components import home_content
+from .components import controls_content
+from .components import data_content
 
 import logging
 logger = logging.getLogger(__name__)
@@ -76,20 +83,20 @@ def index():
         with ui.tab_panels(tabs1, value='tab_sites').classes('w-full') as tab_panel:
 
                 with ui.tab_panel('tab_1').style('font-family: "Rational Display", sans-serif;'):
-                    components.home_content.content()
+                    home_content.content()
                     
                 with ui.tab_panel('tab_2').style('font-family: "Rational Display", sans-serif;'):
                     
-                    components.controls_content.content()
+                    controls_content.content()
                     
                 with ui.tab_panel('tab_3').style('font-family: "Rational Display", sans-serif;'):
-                    components.data_content.content()
+                    data_content.content()
 
                 with ui.tab_panel('tab_4').style('font-family: "Rational Display", sans-serif;'):
-                    components.api_content.content()
+                    api_content.content()
                 
                 with ui.tab_panel('tab_sites').style('font-family: "Rational Display", sans-serif;'):
-                    components.sites_content.content()
+                    sites_content.content()
 
 
         header_below.tailwind("pt-16")
@@ -100,16 +107,16 @@ def index():
 def handle_shutdown():
     logger.info(f"Ending cloudflare-s2s frontend server ")
 
-app.on_shutdown(handle_shutdown)
 
+
+def main() -> None:
+    app.on_shutdown(handle_shutdown)
+    logger.info("\n------------------------------------------------")
+    logger.info(f"Starting cloudflare-s2s frontend server @ port:{appPort}")
 
 
 #ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon="/assets/images/favicon.ico") 
 ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon="🚀") 
 
-
 if __name__=="__main__":
-    logger.info("\n------------------------------------------------")
-    logger.info(f"Starting cloudflare-s2s frontend server @ port:{appPort}")
-
-
+    pass

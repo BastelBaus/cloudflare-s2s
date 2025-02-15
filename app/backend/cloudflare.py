@@ -1,20 +1,18 @@
 
 import os
-import asyncio
 import subprocess
 import queue    
 import threading
-import time
-import uuid
 import json
-
 import logging
-import network
+
+from . import network
 
 logger = logging.getLogger(__name__)
 
 class warp_cli:
-	
+    ''' interface to the warp-cli command line tool'''
+
     
     #################################################################
     # Initialization 
@@ -38,17 +36,17 @@ class warp_cli:
     #################################################################
 
     def get_status(self):
-        #return self.__call_cloudflared('--accept-tos --json status')
-        return self.__call_cloudflared('status')
+        #return self.__call_cloudflare('--accept-tos --json status')
+        return self.__call_cloudflare('status')
 
     def registration_delete(self):
-        return self.__call_cloudflared('registration delete')
+        return self.__call_cloudflare('registration delete')
 
     def disconnect(self):
-        return self.__call_cloudflared('disconnect')
+        return self.__call_cloudflare('disconnect')
 
     def connect(self):
-        return self.__call_cloudflared('connect')        
+        return self.__call_cloudflare('connect')        
         
     def new_connector(self,tunnel_token:str|None=None):
         ''' a (new) tunnel token can optionally be passed. 
@@ -57,40 +55,40 @@ class warp_cli:
         '''
         if not tunnel_token is None:
             self.tunnel_token = tunnel_token            
-        return self.__call_cloudflared(f'connector new {self.tunnel_token}')        
+        return self.__call_cloudflare(f'connector new {self.tunnel_token}')        
 
     def show_registration(self):
-        return self.__call_cloudflared('registration show')            
+        return self.__call_cloudflare('registration show')            
     
     def delete_registration(self):
-        return self.__call_cloudflared('registration delete')            
+        return self.__call_cloudflare('registration delete')            
     
     def show_organization(self):
-        return self.__call_cloudflared('registration organization')            
+        return self.__call_cloudflare('registration organization')            
     
     def settings(self):
-        return self.__call_cloudflared('settings')            
+        return self.__call_cloudflare('settings')            
         
     def debug_network(self):
-        return self.__call_cloudflared('debug network')            
+        return self.__call_cloudflare('debug network')            
 
     def debug_dex(self):
-        return self.__call_cloudflared('debug dex')            
+        return self.__call_cloudflare('debug dex')            
 
     def tunnel_ip(self):
-        return self.__call_cloudflared('tunnel ip list')       
+        return self.__call_cloudflare('tunnel ip list')       
 
     def tunnel_stats(self):
-        return self.__call_cloudflared('tunnel stats')       
+        return self.__call_cloudflare('tunnel stats')       
 
     def vnet(self):
-        return self.__call_cloudflared('vnet')       
+        return self.__call_cloudflare('vnet')       
 
     #################################################################
     # Private functions to handle the communication over the shell
     #################################################################
 
-    def __call_cloudflared(self,argument:str) -> str:
+    def __call_cloudflare(self,argument:str) -> str:
         ''' calls cloudflared with given arguments and returns the output as string '''
         #cmd = f"warp-cli {argument}"
         cmd = f"warp-cli -j --accept-tos {argument}"
@@ -101,7 +99,7 @@ class warp_cli:
         if len(output)>0: return json.loads(output)
         else:             return {}
 
-    def __call_cloudflared_async(self,argument:str) -> None :
+    def __call_cloudflare_async(self,argument:str) -> None :
         ''' calls cloudflared with given arguments and returns the output as string '''
 
         if self.async_proc is not None: raise ValueError('process not finished, stop it before ')

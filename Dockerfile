@@ -5,13 +5,17 @@ FROM python:3.13-slim-bookworm
 #FROM alpine:3.21
 
 ENV WARP_SLEEP=2
-ENV WEBUI_PORT=15650
-ENV API_PORT=15651
+ENV FLASK_RUN_HOST=0.0.0.0
+
+ENV WEBUI_PORT=${WEBUI_TOKEN:-"15650"}
+ENV API_PORT=${API_TOKEN:-"15651"}
 
 #ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
 ENV TUNNEL_TOKEN=${TUNNEL_TOKEN:-""}
+ENV SERVER_NAME=${SERVER_NAME:-""}
+ENV AUTO_CONNECT=${AUTO_CONNECT:-"1"}
 ENV CDIR_WG=192.168.242.1/24
+    
 
 RUN date >/build-date.txt
 
@@ -22,9 +26,7 @@ USER root
 WORKDIR /var/app
 
 # the volume to store the wireguad configuration
-VOLUME /var/data/wireguard/ 
-    # do we realy need this exposed ?
-# what about cloudflare keys and so on ?
+VOLUME /var/data
 
 
 # install general packages
@@ -55,20 +57,17 @@ RUN rm -rf /var/lib/apt/lists/*
 COPY ./app/requirements.txt /var/app
 RUN pip install -r ./requirements.txt
 
-
 EXPOSE ${WEBUI_PORT}
 EXPOSE ${API_PORT}
 
 # copy application and entry point data
-COPY ./app/client /var/app/client
-COPY ./app/server /var/app/server
-COPY ./app/wg.conf .
+COPY ./app/frontend /var/app/frontend
+COPY ./app/backend  /var/app/backend
+COPY ./app/lib/*.py /var/app/lib
+COPY ./app/*.py     /var/app/
+COPY ./app/wg.conf  .
 COPY --chmod=755 ./entrypoint.sh  .
-COPY ./entrypoint.sh  .
+#COPY ./entrypoint.sh  .
 RUN ["chmod", "+x", "./entrypoint.sh"]
 
-
-#CMD ["flask", "--app", "./server/main", "run","-p", "5000"]
-#CMD ["echo", "Docker setup finished"]
-# calling the entrypoint which starts the server and the client
 ENTRYPOINT ["./entrypoint.sh"]

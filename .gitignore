@@ -4,6 +4,7 @@
 .conda
 
 **/*.pyc
+**/__pycache
 
 config.json
 *.code-workspace

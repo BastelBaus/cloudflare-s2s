@@ -3,11 +3,13 @@
 # exit when any command fails
 #set -e
 
-echo "\n---------------------------------------------"
-echo "Starting entry into container"
+echo ""
+echo "---------------------------------------------"
+echo "Starting entry into container: $SERVER_NAME"
 echo "Image built: $(cat /build-date.txt)"
 
-echo "\n---------------------------------------------"
+echo ""
+echo "---------------------------------------------"
 echo "Setting up warp"
 
 ##############################################
@@ -64,13 +66,13 @@ echo "Setting up wireguard"
 
 echo ""
 echo "---------------------------------------------"
-echo "starting the backend and frontend servers"
+echo "starting the backend and frontend servers for $SERVER_NAME"
 
 
-export FLASK_APP=/var/app/server/main.py 
+export FLASK_APP=/var/app/main_backend.py 
 echo   ${FLASK_APP}
 python -m flask run -p $API_PORT &
-python /var/app/client/main.py &
+python /var/app/main_frontend.py &
 
 #flask --app ./server/main run -p $API_PORT &
 #flask --app ./client/main run -p $WEBUI_PORT &

@@ -1,8 +1,8 @@
 from nicegui import ui, app
 
-from config import cfg
-#import api
-from api import apicall
+#from . import config
+
+from ..api import apicall
 import json
 
 #response.json()

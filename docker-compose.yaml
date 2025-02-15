@@ -11,22 +11,30 @@ services:
     #  context: .
 
     ports: # host_port : docker_port
-      - 15650:15650 # the WebUI
-      - 15651:15651 # the REST API
+      - ${API_PORT}:${API_PORT}      # the WebUI
+      - ${WEBUI_PORT}:${WEBUI_PORT}  # the REST API
       - 51820:51820 # wireguard to test !
 
     volumes:
-      - ./app:/var/app2
+      - ./app:/var/app2       # just temp, if neede
+      - ./data:/var/data      # the folder where the data is stored
     #volumes:
     #  - ./app:/app # mounting local app directory
     #  - ~/cloudflared-mgr:/source
     environment:
-      - TUNNEL_TOKEN=${TUNNEL_TOKEN}
+      - TUNNEL_TOKEN=${TUNNEL_TOKEN}    # the default tunnel token, if a token is given in the API, 
+                                        # this as precedence
+      - SERVER_NAME=${SERVER_NAME}      # The instance name (usefull if accessed by other frontends)
+      - WEBUI_PORT=${WEBUI_PORT}        # the port of webui to control several sites
+      - API_PORT=${API_PORT}            # the port of the API for this site
+      - AUTO_CONNECT=1                  # Tries to automatically connect to the warp networp 
+                                        #    yes: 1 (default)   no: 0
+
+      # TODO: how to include the example,.env ??
 
     #  - PUID=1000 # change this to your user id
     #  - PGID=1000 # change this to your group id
     #  - STORAGE_SECRET="change-this-to-yor-own-private-secret"
-
     # some additonal settings needed for routing
     #network_mode: "host"
     cap_add:

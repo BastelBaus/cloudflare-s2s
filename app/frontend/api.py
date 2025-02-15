@@ -184,7 +184,7 @@ def get_warp_status(addr:str) -> str:
     logger.warning(f'unkown return from /warp/status: {result}')
     return "Failure"
 
-async def warp_search_backends(addr:str) -> dict|str:
+def warp_search_backends(addr:str) -> dict|str:
     success,result = apicall( addr + "/warp/search_backends", timeout=120 )
     return result if success else "error"
 
@@ -193,11 +193,13 @@ async def warp_search_backends(addr:str) -> dict|str:
 # functions wrapped in class whcih stores the API address
 ###################################################################
 
-class WARP_STATE: pass
-class WARP_STATE_FAILURE(WARP_STATE): pass
-class WARP_STATE_CONNECTED(WARP_STATE): pass
-class WARP_STATE_CONNECTING(WARP_STATE): pass
-class WARP_STATE_DISCONNECTED(WARP_STATE): pass
+from enum import Enum 
+class WARP_STATE(Enum): 
+    FAILURE : str     = "Failure"
+    CONNECTED :str    = "Connected"
+    CONNECTING :str   = "Connecting"
+    DISCONNECTED :str = "Disconnected"
+    
 
 class site:
     def __init__(self,addr:str):
@@ -250,8 +252,8 @@ class site:
     def wget_active_vnet(self) -> str:
         return wget_active_vnet(self.addr)
 
-    async def warp_search_backends(self) -> str:
-        return await warp_search_backends(self.addr)
+    def warp_search_backends(self) -> str:
+        return warp_search_backends(self.addr)
 
 
     def get_warp_status(self) -> str:

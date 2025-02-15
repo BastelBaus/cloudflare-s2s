@@ -1,9 +1,10 @@
-from nicegui import ui, app
+from nicegui import ui, app, run
 import logging
 logger = logging.getLogger(__name__)
 
-import config 
-import api
+from ..config import FrontendConfig
+
+from .. import api
 
 _SERVER_CHECK_TIME = 5
 _WARP_CHECK_TIME   = 5
@@ -255,14 +256,24 @@ class siteHandler:
             status = self.api.warp_connect()
         #print("Connect Button ",self.warp_connected,status)
         self.check_warp_connection()
-        
+
     async def check_warp_backends(self):
+        print("start search")
         self.warp_backend_search   = False
-        content.update()
-        result = await self.api.warp_search_backends()
-        print("warp:",result)
-        self.warp_backend_search   = True
-        content.update()
+        #ui.timer(0.01, lambda: self._check_warp_backends() )
+        await self._check_warp_backends() 
+
+    async def _check_warp_backends(self):
+        print("start timer search")
+        result = await run.io_bound(self.api.warp_search_backends)
+        logger.info(f"warp backends serach results: {result}")
+        if result is None: str = "error occured"
+        else:
+            self.warp_backend_search   = True
+            str =  "\n".join( [f" <li>&nbsp; &nbsp; {res['ip']} ({res['host']})</li>" for res in result] )
+            str = f"Backends with open ports:<br><ul>{str}</ul>"
+        self.warp_network = str
+        ui.notify(f'Finished backend search: {str} ')
         
 ###########################################################################################
 # here is the layout of the site
@@ -272,11 +283,12 @@ class siteHandler:
 def content() -> None:
     ''' the function doing the layout of the site'''
 
-    config.cfg.load() # reload the config file each time !
+    cfg = FrontendConfig()
+    #config.cfg.load() # reload the config file each time !
 
     sites = []
-    for site in config.cfg.data['sites']:
-        sites.append( siteHandler(site,config.cfg) )
+    for site in cfg.data['sites']:
+        sites.append( siteHandler(site,cfg) )
 
     # delete a site
     with ui.dialog() as dialog, ui.card():
@@ -284,20 +296,20 @@ def content() -> None:
         with ui.row():
             ui.button('Yes', on_click=lambda: dialog.submit('Yes'))
             ui.button('No', on_click=lambda: dialog.submit('No'))
-    async def show(site,i):
+    async def show(i):
         result = await dialog
         #ui.notify(f'You chose {result} in dialog {i}')
         if result == 'Yes':
-            del config.cfg.data['sites'][i]
-            config.cfg.store()
+            del cfg.data['sites'][i]
+            cfg.store()
             content.refresh()
             ui.notify(f'deleted')
         else: return
 
     # add a site
     def add_site():
-        config.cfg.data['sites'].append({"name":"new site","address":"http://localhost:15651"}) # TODO: checnge default values
-        config.cfg.store()
+        cfg.data['sites'].append({"name":"new site","address":"http://localhost:15651"}) # TODO: checnge default values
+        cfg.store()
         content.refresh()
         ui.notify(f'site added')
             
@@ -326,7 +338,7 @@ def content() -> None:
                             with ui.tooltip():
                                 ui.html().bind_content_from(site,"connection_tooltip")
                 # delete the site
-                ui.button('delete', on_click=lambda site=site,i=i: show(site,i))
+                ui.button('delete', on_click=lambda i=i: show(i))
 
             ui.separator().classes('w-full')
             
@@ -359,53 +371,14 @@ def content() -> None:
                         .bind_visibility_from(site,"warp_visible")
 
             with ui.button("seach backends",on_click=lambda i=i: sites[i].check_warp_backends()  ) \
-                .bind_visibility_from(site,"warp_visible") \
-                .bind_enabled_from(site,"warp_backend_search") :
+                    .bind_visibility_from(site,"warp_visible") \
+                    .bind_enabled_from(site,"warp_backend_search") :
                 ui.tooltip("Note, this might take a while sincve the backend nmap's a large address range ")
             ui.html()   .bind_content_from(site,'warp_network') \
 
 
-
-            continue
-                        #.classes('bg-green')                
- 
-            ui.button("register (takes some seconds)",on_click=lambda ap= site_api: register(ap)  )
-            ui.button("connect",on_click=lambda ap= site_api: connect(ap) )
-            
-            ui.label( str( site_api.wget_active_vnet() )) 
-            ui.label( "updated" ) 
-
-                    
-            
-            
-            
-
-
-    #with ui.row():
-    #    ui.icon("o_info").classes('text-xl')
-
-    #ui.label("Welcome!").style('color: black; font-family: "Rational Display", sans-serif; font-size:28px;')
-
-    #ui.label("This App is build based on the NiceGUI framework - modified and adapted for easyier modularized use.").style('color: black; font-family: "Rational Display", sans-serif; font-size:18px;')
-
-    #ui.link('http://localhost:15650/api','http://localhost:15650/api')
-
-    #base_url = "http://localhost:15651/"
-    #base_url = "http://192.168.0.23:15651/"
-    #api_url = base_url + "api"
-    #status, response = call_api(api_url)
-    #print(status)
-    #print(response.json())
-    
-    
-
-
-#@ui.refreshable
-#def number_ui() -> None:
-#   ui.label(', '.join(str(n) for n in sorted(numbers)))
-
-#def add_number() -> None:
-#numbers.append(random.randint(0, 100))
-#    number_ui.refresh()
-#
-#number_ui()
+            # helper with some styles
+            #.classes('bg-green')                
+            # classes('text-xl')
+            #.style('color: black; font-family: "Rational Display", sans-serif; font-size:28px;')
+            #.style('color: black; font-family: "Rational Display", sans-serif; font-size:18px;')
