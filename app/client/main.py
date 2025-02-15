@@ -13,10 +13,10 @@ from nicegui import app, ui
 import logging
 logger = logging.getLogger(__name__)
 
-#logging.basicConfig(
-#    level=logging.INFO,
-#    format="frontend %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
-#    stream=sys.stdout)
+logging.basicConfig(
+    level=logging.INFO,
+    format="frontend %(levelname)s [%(name)s.%(funcName)s:%(lineno)d] %(message)s",
+    stream=sys.stdout)
 
 import pathlib
 CUR_DIR = pathlib.Path(__file__).parent.resolve()

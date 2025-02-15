@@ -5,6 +5,8 @@ import json
 CONFIG_FILENAME = 'config.json'
 VERSION = "0.1"
 
+import logging
+logger = logging.getLogger(__name__)
 
 class config:
     
@@ -13,24 +15,33 @@ class config:
     
         self.data = config._default_config()
         if not os.path.exists(CONFIG_FILENAME):
+            logger.warning(f"warning, could not find config file: {CONFIG_FILENAME}, create new one")
+            self._validate_and_correct()
             self.store()
         if not os.path.exists(CONFIG_FILENAME):
-            print("warning, could not find or create config file")
+            logger.warning(f"warning, could not create config file: {CONFIG_FILENAME}")
         else: self.load()
 
 
     def load(self):
         ''' load the current configuration from a file'''
         with open(CONFIG_FILENAME, 'r') as file:
-            self.data = json.load(file)
+            try:
+                self.data = json.load(file)
+            except: # in case of any error, start with a new file
+                logger.warning("Could not read config file!")
+                self.data = {}
         self._validate_and_correct()
 
     def store(self):
-        ''' store the currenbt configuration to a file '''
+        ''' store the current configuration to a file '''
         with open(CONFIG_FILENAME, 'w') as file:
-            json.dump(self.data, file)
+            json.dump(self.data, file, indent = " ")
+        logger.warning(f"Wrote file:\n{self.data}")
 
     def _validate_and_correct(self):
+        if not hasattr(self,"data"): self.data = {}
+        if not isinstance(self.data,dict): self.data = {}
         if "version" not in self.data.keys(): self.data["version"] = VERSION
         if "sites"   not in self.data.keys(): self.data["sites"] = []
         for i in range(len(self.data["sites"])):

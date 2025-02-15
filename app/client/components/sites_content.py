@@ -88,7 +88,7 @@ class siteHandler:
         else:             
             status = self.api.get_warp_status()
             if not status: status = "Unchecked"
-            if self.warp_conn_state == status: return
+            if self.warp_conn_state == status: return #FIXME: we might update the warp information as well, especiily if the first check did not work !
             self.warp_conn_state = status
             self._set_warp_connection_state(status)
 
@@ -143,6 +143,8 @@ class siteHandler:
             self.warp_connect_button   = "disconnect"
             self.warp_connect_enable   = True
             self.warp_info             = self._set_warp_info()
+            self.warp_network          = ""
+            self.warp_backend_search   = True
 
         elif state == "Disconnected": 
             self.warp_connected        = False
@@ -153,6 +155,8 @@ class siteHandler:
             self.warp_connect_button   = "connect"
             self.warp_connect_enable   = True
             self.warp_info             = ""
+            self.warp_network          = ""
+            self.warp_backend_search   = False
 
         elif state == "Connecting": 
             self.warp_connected        = False
@@ -163,6 +167,8 @@ class siteHandler:
             self.warp_connect_button   = "connecting"
             self.warp_connect_enable   = False
             self.warp_info             = ""
+            self.warp_network          = ""
+            self.warp_backend_search   = False
 
         elif state == "Unregistered": 
             self.warp_connected        = False
@@ -173,6 +179,8 @@ class siteHandler:
             self.warp_connect_button   = "connect"
             self.warp_connect_enable   = False
             self.warp_info             = ""
+            self.warp_network          = ""
+            self.warp_backend_search   = False
 
         elif state=="Unchecked": 
             self.warp_connected        = False
@@ -183,6 +191,8 @@ class siteHandler:
             self.warp_connect_button   = "unknown"
             self.warp_connect_enable   = False
             self.warp_info             = ""
+            self.warp_network          = ""
+            self.warp_backend_search   = False
 
         elif state=="Failure": 
             self.warp_connected        = False
@@ -193,6 +203,8 @@ class siteHandler:
             self.warp_connect_button   = "unknown"
             self.warp_connect_enable   = False
             self.warp_info             = ""
+            self.warp_network          = ""
+            self.warp_backend_search   = False
 
         else: 
             self.warp_connected        = False
@@ -203,7 +215,9 @@ class siteHandler:
             self.warp_connect_button   = "unknown"
             self.warp_connect_enable   = False
             self.warp_info             = ""
-            print(f"error, should never end here, state: {state} !!")
+            self.warp_network          = ""
+            self.warp_backend_search   = False
+            logger.warning(f"Should never end here when checking warp status (state: {state})!")
     #######################################################################################
 
     def site_name_changed(self,new_name):
@@ -211,14 +225,17 @@ class siteHandler:
         self.cfg.store()
         self.name = new_name
 
-    def site_addr_changed(self,new_addr):
+    def site_addr_changed(self,event):
+        new_addr = str(event.sender.value)
+        logger.info(f"changed address from {self.address} to {new_addr}")
         self.site["address"] = new_addr
         self.cfg.store()
-        self.address = new_addr
         self.set_api_addr( new_addr )  
-        self.check_connection()
+        #self.check_connection() # if both sites are connected this would not refresh anything
+        content.refresh()
 
-    def tunnel_token_changed(self,token):
+    def tunnel_token_changed(self,event):
+        token = str(event.sender.value)
         self.site["token"] = token.strip()
         self.cfg.store()
         #sites[site_index].set_api_addr(new_addr.strip())
@@ -239,6 +256,14 @@ class siteHandler:
         #print("Connect Button ",self.warp_connected,status)
         self.check_warp_connection()
         
+    async def check_warp_backends(self):
+        self.warp_backend_search   = False
+        content.update()
+        result = await self.api.warp_search_backends()
+        print("warp:",result)
+        self.warp_backend_search   = True
+        content.update()
+        
 ###########################################################################################
 # here is the layout of the site
 ###########################################################################################
@@ -247,8 +272,7 @@ class siteHandler:
 def content() -> None:
     ''' the function doing the layout of the site'''
 
-
-    config.cfg.load()
+    config.cfg.load() # reload the config file each time !
 
     sites = []
     for site in config.cfg.data['sites']:
@@ -278,9 +302,10 @@ def content() -> None:
         ui.notify(f'site added')
             
         
-    ui.button('add site', on_click=add_site)
+    with ui.page_sticky(position="right"):
+        ui.button('add site', on_click=add_site)
     for i,site in enumerate(sites):
-        with ui.card():
+        with ui.card().classes('center'):
 
             # handle the different inputrs
                 
@@ -292,9 +317,10 @@ def content() -> None:
 
                 # the site address and connection status
                 with ui.input(  label='site address', value=site.address,
-                                on_change=lambda e,i=i: sites[i].site_addr_changed(e.value),
+                                #on_change=lambda e,i=i: sites[i].site_addr_changed(e.value),
                                 #validation={'Input too long': lambda value: len(value) < 40} # TODO: could have some fun with hostname validator :-)
-                            ).props("size=40") as ip_input:
+                            ).on("blur",lambda e,i=i: sites[i].site_addr_changed(e)) \
+                            .props("size=40") as ip_input:
                     with ip_input.add_slot('append'):
                         with ui.icon('cloud_off').bind_name_from(site,"site_connected_icon"): # color="#FF0000"
                             with ui.tooltip():
@@ -307,8 +333,10 @@ def content() -> None:
             # the tunnel token and tunnel connection status
             with ui.row():
                 with ui.input(label='connector (tunnel token)', value="",
-                    on_change=lambda e,i=i: sites[i].tunnel_token_changed(e.value))  \
+                    #on_change=lambda e,i=i: sites[i].tunnel_token_changed(e.value)
+                    )  \
                     .props("size=40") \
+                    .on("blur",lambda e,i=i: sites[i].tunnel_token_changed(e.value)) \
                     .bind_value_from(site,"warp_token") \
                     .bind_visibility_from(site,"warp_visible") as warp_token:
                     with warp_token.add_slot('append'):
@@ -330,12 +358,15 @@ def content() -> None:
             ui.html()   .bind_content_from(site,'warp_info') \
                         .bind_visibility_from(site,"warp_visible")
 
+            with ui.button("seach backends",on_click=lambda i=i: sites[i].check_warp_backends()  ) \
+                .bind_visibility_from(site,"warp_visible") \
+                .bind_enabled_from(site,"warp_backend_search") :
+                ui.tooltip("Note, this might take a while sincve the backend nmap's a large address range ")
+            ui.html()   .bind_content_from(site,'warp_network') \
 
 
 
             continue
-            site_api = api.site(site["address"])
-
                         #.classes('bg-green')                
  
             ui.button("register (takes some seconds)",on_click=lambda ap= site_api: register(ap)  )

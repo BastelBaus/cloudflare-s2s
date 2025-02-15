@@ -2,6 +2,7 @@
 # Abstracts the call to the cloudflare-s2s backend api
 #
 ###################################################################
+#pylint: disable=logging-fstring-interpolation
 
 import requests
 from urllib3.exceptions import (ConnectTimeoutError, MaxRetryError,
@@ -11,20 +12,28 @@ import json
 import logging
 logger = logging.getLogger(__name__)
 
-# pylint: disable=logging-fstring-interpolation
-
 _DEFAULT_API_TIMEOUT = 1
 
-def apicall(api_url:str) -> tuple[bool,str|dict]:
+###################################################################
+# the baser class to call the api and handling errors
+###################################################################
+
+def apicall(api_url:str, timeout:int=_DEFAULT_API_TIMEOUT) -> tuple[bool,str|dict]:
     ''' Calls the API url and returns a tuple with a 
         boolean status and the result as hash / list .
         On error (False), the content contains the 
         error message as string.
     '''
     try:
-        logger.info(f"API: {api_url}")
-        response = requests.get(api_url, timeout=_DEFAULT_API_TIMEOUT)
-        logger.info("RET:\n{response}")        
+        logger.debug(f"API: {api_url}")
+        response = requests.get(api_url, timeout=timeout)
+        logger.debug(f"RET: {response.status_code}\n{response.content}")        
+        
+    except requests.exceptions.ReadTimeout as error: 
+        logger.debug(f"ReadTimeout: {error}")
+        status = False
+        result = str(error)
+        return  status, result    
     except requests.exceptions.ConnectTimeout as error: 
         logger.debug(f"ConnectTimeout: {error}")
         status = False
@@ -84,6 +93,9 @@ def apicall(api_url:str) -> tuple[bool,str|dict]:
     
     return  status, {}
 
+###################################################################
+# functions to abstract teh API to python interface
+###################################################################
     
 
 def get_version(addr:str) -> str:
@@ -107,11 +119,11 @@ def warp_register(addr:str) -> bool:
     return success
 
 def warp_unregister(addr:str) -> bool:
-    success,result = apicall( addr + "/warp/registration/delete" )
+    success,result =  apicall( addr + "/warp/registration/delete" )
     return success
 
 def warp_register_show(addr:str) -> str:
-    success,result = apicall( addr + "/warp/registration/show" )
+    success,result =  apicall( addr + "/warp/registration/show" )
     return result if success else "error"
 
 
@@ -151,15 +163,6 @@ def docker_interfaces(addr:str) -> dict|str:
     success,result = apicall( addr + "/net/interfaces" )
     return result if success else "error"
 
-
-
-
-class WARP_STATE_FAILURE: pass
-class WARP_STATE_CONNECTED: pass
-class WARP_STATE_CONNECTING: pass
-class WARP_STATE_DISCONNECTED: pass
-
-
 def get_warp_status(addr:str) -> str:
     ''' returns the status of the warp interface 
             'Failure': on any failures including unknown statis
@@ -180,6 +183,21 @@ def get_warp_status(addr:str) -> str:
          else: return "unkown"
     logger.warning(f'unkown return from /warp/status: {result}')
     return "Failure"
+
+async def warp_search_backends(addr:str) -> dict|str:
+    success,result = apicall( addr + "/warp/search_backends", timeout=120 )
+    return result if success else "error"
+
+
+###################################################################
+# functions wrapped in class whcih stores the API address
+###################################################################
+
+class WARP_STATE: pass
+class WARP_STATE_FAILURE(WARP_STATE): pass
+class WARP_STATE_CONNECTED(WARP_STATE): pass
+class WARP_STATE_CONNECTING(WARP_STATE): pass
+class WARP_STATE_DISCONNECTED(WARP_STATE): pass
 
 class site:
     def __init__(self,addr:str):
@@ -231,7 +249,11 @@ class site:
 
     def wget_active_vnet(self) -> str:
         return wget_active_vnet(self.addr)
-    
+
+    async def warp_search_backends(self) -> str:
+        return await warp_search_backends(self.addr)
+
+
     def get_warp_status(self) -> str:
         ''' returns the status of the warp interface 
                 'Failure': on any failures including unknown statis

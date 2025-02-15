@@ -31,6 +31,7 @@ def check_open_ports(ip_range:str=_DEFAULT_CLOUDFLARE_IP_RANGE, port:int|str='15
         if not '/open/' in line: continue
         ip   = line.split(' ')[1]
         host = line.split(' ')[2]
+        host = re.findall(r"\((.*?)\)", host)[0] # grep the values between the brackets
         result.append( {'ip':ip, 'host':host} )
     return result
     

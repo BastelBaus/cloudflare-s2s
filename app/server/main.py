@@ -154,6 +154,11 @@ def interface_ip() -> str:
 def interface_mysubnet() -> str:
     return { 'mysubnet': warpcli.estimate_own_subnet() }
  
+ 
+@app.get('/warp/search_backends')
+def warp_search_backends():    
+    return network.check_open_ports()
+
 
 ###########################################################
 # The wireguard interface
@@ -174,10 +179,6 @@ def get_publickey():
 ###########################################################
 # The general network
 ###########################################################
-
-@app.get('/net/check_open_ports')
-def check_open_ports():    
-    return network.check_open_ports()
 
 
 

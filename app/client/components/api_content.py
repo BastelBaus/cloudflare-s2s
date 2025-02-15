@@ -37,7 +37,7 @@ from urllib3.exceptions import (ConnectTimeoutError, MaxRetryError,
 # TODO: if API call is verys slow, what to do then
 
 
-def do_api_call(api,set_result):
+async def do_api_call(api,set_result):
     status,result = apicall(api)
     if status: set_result(result.text)
     else: set_result(result)
@@ -53,7 +53,7 @@ def do_api_call_ui(api: str):
 
  
 
-def content() -> None:
+async def content() -> None:
 
     #ui.select(['black', 'red', 'green', 'blue'],
     #          value=color, on_change=lambda e: set_color(e.value))
