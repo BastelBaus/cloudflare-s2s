@@ -27,15 +27,12 @@ class siteHandler:
         self.site = site # the site config element
         self.name = site["name"]
         self.set_api_addr( site["address"] )     
-        
 
         self.connection_state    = False
         self.warp_conn_state     = "Unchecked"
-        
+
         self._set_site_connection_state(self.connection_state)
         self._set_warp_connection_state(self.warp_conn_state )
-
-
 
         ui.timer(defaults.SERVER_CHECK_TIME , lambda: self.check_connection() )
         ui.timer(defaults.WARP_CHECK_TIME, lambda: self.check_warp_connection() )
@@ -70,6 +67,8 @@ class siteHandler:
             version    = self.api.get_version()
             builddate  = self.api.get_builddate()
             token      = self.api.get_connector()
+            site_name  = self.api.get_site_name()
+            self.site_name           = site_name
             self.site_connected_icon = "cloud_done"
             self.server_info         = "Version: v"+ version + " Build:" + builddate
             self.connection_tooltip  = f"Status of server connection, checked every {defaults.SERVER_CHECK_TIME} seconds<br>" \
@@ -80,6 +79,7 @@ class siteHandler:
             self.warp_token          = token
 
         else: # we change from connected to not connected
+            self.site_name           = "unknown"
             self.site_connected_icon = "cloud_off"
             self.server_info         = "unkown"
             self.connection_tooltip  = f"Status of server connection, checked every {defaults.SERVER_CHECK_TIME} seconds"
@@ -326,11 +326,6 @@ def content() -> None:
             # handle the different inputrs
                 
             with ui.row():
-                # the site name
-                ui.input(label='site name', value=site.name,
-                    #on_change=lambda e,i=isite: site_name_changed(e.value,i),
-                    on_change=lambda e,i=i: sites[i].site_name_changed(e.value) ).props("size=40")
-
                 # the site address and connection status
                 with ui.input(  label='site address', value=site.address,
                                 #on_change=lambda e,i=i: sites[i].site_addr_changed(e.value),
@@ -341,6 +336,14 @@ def content() -> None:
                         with ui.icon('cloud_off').bind_name_from(site,"site_connected_icon"): # color="#FF0000"
                             with ui.tooltip():
                                 ui.html().bind_content_from(site,"connection_tooltip")
+
+                # the site name
+                ui.input(label='site name', value="unknown").props("size=40") \
+                    .bind_value_from(site,'site_name')
+                #ui.input(label='site name', value=site.name,
+                    #on_change=lambda e,i=isite: site_name_changed(e.value,i),
+                    #on_change=lambda e,i=i: sites[i].site_name_changed(e.value) ).props("size=40")
+
                 # delete the site
                 ui.button('delete', on_click=lambda i=i: show(i))
 

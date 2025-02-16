@@ -15,7 +15,3 @@ logging.basicConfig(
     level=logging.INFO,
     format="[%(name)s.%(funcName)s:%(lineno)d] %(levelname)s %(message)s",
     stream=sys.stdout)
-
-
-if __name__ == "__main__":
-    main()

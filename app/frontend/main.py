@@ -22,6 +22,16 @@ from .components import data_content
 
 logger = logging.getLogger(__name__)
 
+if  'WEBUI_PORT' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
+    app_port = int(os.environ['WEBUI_PORT'])
+else:
+    app_port = defaults.WEB_PORT
+
+if  'SERVER_NAME' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
+    server_name = int(os.environ['SERVER_NAME'])
+else:
+    server_name = defaults.SERVER_NAME
+
 
 
 # Nice starter: https://github.com/frycodelab/nicegui-component-based/tree/main
@@ -31,7 +41,7 @@ def index():
 
     ui.colors(primary='#28323C', secondary="#B4C3AA", positive='#53B689', accent='#111B1E')
 
-    with header.frame(title=defaults.APP_NAME, version=defaults.VERSION):
+    with header.frame(name=server_name):
 
         with ui.header().classes(replace='row items-center') \
             .style('background-color:white; border-bottom: 1px solid #D4D6D8;') as header_below:
@@ -102,19 +112,20 @@ def handle_shutdown() -> None:
     logger.info("Ending cloudflare-s2s frontend server ")
 
 
-if  'WEBUI_PORT' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
-    app_port = int(os.environ['WEBUI_PORT'])
-else:
-    app_port = defaults.WEB_PORT
-
-#TODO: make this favicon working
-#ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon="/assets/images/favicon.ico") 
-ui.run(storage_secret="myStorageSecret",title=defaults.APP_NAME,port=app_port,favicon="🚀")
-
 def main() -> None:
-    app.on_shutdown(handle_shutdown)
+    ''' main function for initialization '''
     logger.info("\n------------------------------------------------")
     logger.info(f"Starting cloudflare-s2s frontend server @ port:{app_port}")
 
     CUR_DIR = pathlib.Path(__file__).parent.resolve()
     app.add_static_files("/assets",f'{CUR_DIR}/assets')
+    logger.info(f'publish images from: {CUR_DIR}/assets')
+
+
+#TODO: make this favicon working
+#ui.run(storage_secret="myStorageSecret",title=appName,port=appPort,favicon="/assets/images/favicon.ico") 
+ui.run(storage_secret="myStorageSecret",title=defaults.APP_NAME,port=app_port,favicon="🚀")
+
+app.on_shutdown(handle_shutdown)
+app.on_startup(main)
+

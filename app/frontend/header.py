@@ -8,17 +8,19 @@ from contextlib import contextmanager
 from nicegui import ui
 import logging
 
+from . import defaults
+
 logger = logging.getLogger(__name__)
 
 @contextmanager
-def frame(title: str, version : str):
+def frame(name: str):
     """Custom page frame to share the same styling and behavior across all pages"""
     with ui.header().classes(replace='row items-center h-16') as header:
         ui.label("").tailwind("pr-6")
         #ui.image('assets/images/logo.png').classes("w-24")
         ui.label("").tailwind("px-0.5")
 
-        ui.label(title).style('color: white; font-size: 125%;')\
+        ui.label(f"{defaults.APP_NAME} @ {name}").style('color: white; font-size: 125%;')\
             .tailwind("px-2.5 pl-4", "font-bold", "text-white-800")
         #ui.chip(version, color="grey").style("").props("outline")
 
