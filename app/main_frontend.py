@@ -6,7 +6,6 @@
 
 import sys
 import logging
-from nicegui import ui
 
 from frontend.main import main
 
@@ -19,4 +18,4 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    app = main()
+    main()

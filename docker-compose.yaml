@@ -1,5 +1,6 @@
 services:
   cloudflare-s2s:
+    container_name: cloudflared-s2s
     image: cloudflared-s2s:staging
     #image: bastelbaus/cloudflared-s2s:latest    
     pull_policy: build

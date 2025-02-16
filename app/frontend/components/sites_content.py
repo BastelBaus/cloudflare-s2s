@@ -1,13 +1,15 @@
 from nicegui import ui, app, run
 import logging
-logger = logging.getLogger(__name__)
 
-from ..config import FrontendConfig
+from frontend.config import FrontendConfig
+from frontend import defaults
 
 from .. import api
 
-_SERVER_CHECK_TIME = 5
-_WARP_CHECK_TIME   = 5
+
+logger = logging.getLogger(__name__)
+
+
 
 @ui.refreshable
 def warp_status(site_api) -> None:
@@ -33,8 +35,10 @@ class siteHandler:
         self._set_site_connection_state(self.connection_state)
         self._set_warp_connection_state(self.warp_conn_state )
 
-        ui.timer(_SERVER_CHECK_TIME, lambda: self.check_connection() )
-        ui.timer(_WARP_CHECK_TIME, lambda: self.check_warp_connection() )
+
+
+        ui.timer(defaults.SERVER_CHECK_TIME , lambda: self.check_connection() )
+        ui.timer(defaults.WARP_CHECK_TIME, lambda: self.check_warp_connection() )
 
     def set_api_addr(self,api_addr):
         self.address = api_addr
@@ -68,7 +72,7 @@ class siteHandler:
             token      = self.api.get_connector()
             self.site_connected_icon = "cloud_done"
             self.server_info         = "Version: v"+ version + " Build:" + builddate
-            self.connection_tooltip  = f"Status of server connection, checked every {_SERVER_CHECK_TIME} seconds<br>" \
+            self.connection_tooltip  = f"Status of server connection, checked every {defaults.SERVER_CHECK_TIME} seconds<br>" \
                                        f"&nbsp;&nbsp;<b>connected</b><br>" \
                                        f"&nbsp;&nbsp;Version: v{version}<br>" \
                                        f"&nbsp;&nbsp;Build:   {builddate}"
@@ -78,7 +82,7 @@ class siteHandler:
         else: # we change from connected to not connected
             self.site_connected_icon = "cloud_off"
             self.server_info         = "unkown"
-            self.connection_tooltip  = f"Status of server connection, checked every {_SERVER_CHECK_TIME} seconds"
+            self.connection_tooltip  = f"Status of server connection, checked every {defaults.SERVER_CHECK_TIME} seconds"
             self.warp_visible        = False # only visible when connected
             self.warp_token          = "unknown"
 
@@ -133,7 +137,7 @@ class siteHandler:
         ''' sets all warp connection state icons and texts'''
         logger.info(f"Set warp connection state: {state} !!")
 
-        self.warp_tooltip          =  f"Status of warp connection, checked every {_WARP_CHECK_TIME} seconds"
+        self.warp_tooltip          =  f"Status of warp connection, checked every {defaults.WARP_CHECK_TIME} seconds"
 
         if state == "Connected": # if true, we changed from not connected to connected
             self.warp_connected        = True
@@ -233,7 +237,7 @@ class siteHandler:
         self.cfg.store()
         self.set_api_addr( new_addr )  
         #self.check_connection() # if both sites are connected this would not refresh anything
-        content.refresh()
+        #content.refresh()
 
     def tunnel_token_changed(self,event):
         token = str(event.sender.value)
@@ -348,7 +352,7 @@ def content() -> None:
                     #on_change=lambda e,i=i: sites[i].tunnel_token_changed(e.value)
                     )  \
                     .props("size=40") \
-                    .on("blur",lambda e,i=i: sites[i].tunnel_token_changed(e.value)) \
+                    .on("blur",lambda e,i=i: sites[i].tunnel_token_changed(e)) \
                     .bind_value_from(site,"warp_token") \
                     .bind_visibility_from(site,"warp_visible") as warp_token:
                     with warp_token.add_slot('append'):

@@ -61,11 +61,12 @@ EXPOSE ${WEBUI_PORT}
 EXPOSE ${API_PORT}
 
 # copy application and entry point data
-COPY ./app/frontend /var/app/frontend
-COPY ./app/backend  /var/app/backend
-COPY ./app/lib/*.py /var/app/lib
-COPY ./app/*.py     /var/app/
-COPY ./app/wg.conf  .
+COPY ./app/ /var/app/
+#COPY ./app/frontend /var/app/frontend
+#COPY ./app/backend  /var/app/backend
+#COPY ./app/lib/*.py /var/app/lib
+#COPY ./app/*.py     /var/app/
+#COPY ./app/wg.conf  .
 COPY --chmod=755 ./entrypoint.sh  .
 #COPY ./entrypoint.sh  .
 RUN ["chmod", "+x", "./entrypoint.sh"]

@@ -3,11 +3,11 @@
 #######################################################################################
 
 import logging
-logger = logging.getLogger(__name__)
-
 from . import defaults
-from ..lib.config import Config
+from lib.config import Config
 
+
+logger = logging.getLogger(__name__)
 
 class BackendConfig(Config):
     ''' create the configuration file for the backend '''

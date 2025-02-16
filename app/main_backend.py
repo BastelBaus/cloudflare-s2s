@@ -1,3 +1,9 @@
+#
+#
+#
+###############################################################################
+# pylint: disable=logging-fstring-interpolation
+
 import sys
 import logging
 
@@ -13,4 +19,6 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    app = main()
+    #app = main()
+    main()
+    

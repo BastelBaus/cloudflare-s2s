@@ -1,2 +1,2 @@
 
-from . import DEFAULTS
+from . import defaults

@@ -26,7 +26,7 @@ class Config(ABC):
             self._validate_and_correct()
             self.store()
         if not os.path.exists(self.filename):
-            logger.warning(f"warning, could not create config file: {self.filename}")
+            logger.warning(f"could not create config file: {self.filename}")
         else: self.load()
 
 
@@ -44,10 +44,15 @@ class Config(ABC):
 
     def store(self):
         ''' store the current configuration to a file '''
-        with open(self.filename, 'w', encoding="utf-8") as file:
-            json.dump(self.data, file, indent = " ")
-        logger.info(f"Wrote file: {self.filename}\n{self.data}")
-
+        try:
+            with open(self.filename, 'w', encoding="utf-8") as file:
+                json.dump(self.data, file, indent = " ")
+            logger.info(f"Wrote file: {self.filename}\n{self.data}")
+        except: # pylint: disable=bare-except
+                # in case of any error, start with a new file
+                # TODO: what to catch ???
+            logger.warning(f"Could not store file: {self.filename}\n{self.data}")
+        
     @abstractmethod
     def _validate_and_correct(self):
         ''' must ensure that self.data is a correct structure ! '''

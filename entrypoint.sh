@@ -69,9 +69,10 @@ echo "---------------------------------------------"
 echo "starting the backend and frontend servers for $SERVER_NAME"
 
 
-export FLASK_APP=/var/app/main_backend.py 
-echo   ${FLASK_APP}
-python -m flask run -p $API_PORT &
+#export FLASK_APP=/var/app/main_backend.py 
+#echo   ${FLASK_APP}
+#python -m flask run -p $API_PORT &
+python /var/app/main_backend.py &
 python /var/app/main_frontend.py &
 
 #flask --app ./server/main run -p $API_PORT &

@@ -92,10 +92,10 @@ class warp_cli:
         ''' calls cloudflared with given arguments and returns the output as string '''
         #cmd = f"warp-cli {argument}"
         cmd = f"warp-cli -j --accept-tos {argument}"
-        logger.info(f"cmd: {cmd}")
+        logger.debug(f"cmd: {cmd}")
         stream = os.popen(cmd)
         output = stream.read()
-        logger.info(f"returned:\n{output}")
+        logger.debug(f"returned:\n{output}")
         if len(output)>0: return json.loads(output)
         else:             return {}
 
@@ -129,18 +129,18 @@ class warp_cli:
         '''
         own_subnet = ''
         tunnels = self.tunnel_ip()
-        logger.info(f"Tunnels: {tunnels}")
+        logger.debug(f"Tunnels: {tunnels}")
         try:
             is_cloudflare = [0] * len(tunnels['routes'])
             for i,tunnel in enumerate(tunnels['routes']):
-                logger.info(f"{i} : {tunnel}")
+                logger.debug(f"{i} : {tunnel}")
                 ip = tunnel['value'].split('/')[0]
                 ip_parts = ip.split('.')
                 ip_parts[3]= '1' # TODO: change to +1!
                 ip = '.'.join(ip_parts)
-                logger.info(f"ip -->  {ip}")
+                logger.debug(f"ip -->  {ip}")
                 route_to = network.get_route_to(ip)
-                logger.info(f"route -->  {route_to}")
+                logger.debug(f"route -->  {route_to}")
                 dev = [a for a in route_to if a['dev']=='CloudflareWARP' ]
                 if len(dev)>0: continue # this is cloudflare !
                 own_subnet = tunnel['value']                
@@ -160,13 +160,13 @@ class warp_cli:
     def get_interface_ip(self) -> str:
         ''' returns the internal IP of the cloudflare interface as string. '''
         interfaces = network.get_interfaces()
-        logger.info(f"interfaces: {interfaces}")
+        logger.debug(f"interfaces: {interfaces}")
         if not isinstance(interfaces,list): interfaces = [interfaces]
         try:
             ip = [a for a in interfaces if a['ifname']=='CloudflareWARP' ][0]['addr_info'][0]
-            logger.info(f"ip: {ip}")
+            logger.debug(f"ip: {ip}")
             ip = ip['local'] + '/' + str(ip['prefixlen'])
-            logger.info(f"ip: {ip}")
+            logger.debug(f"ip: {ip}")
         except:
             ip = ''
         return ip

@@ -4,46 +4,48 @@
 ###############################################################################
 # pylint: disable=logging-fstring-interpolation
 
-from flask import Flask, request 
 import os
 import json
+import time
+import logging
 
+from flask import Flask, request
 
 from .cloudflare import warp_cli
 from .wireguard import wireguard
 from . import network
 from . import defaults
 from . import config
-    
-import logging
+
 logger = logging.getLogger(__name__)
 
 
-def main() -> Flask:
+def main() -> None: #-> Flask:
+    ''' main function handling config paramters, setup the server and autoconnect '''
 
     ###########################################################
     # loading environmental variables
     ###########################################################
 
-    if 'API_PORT' in os.environ.keys():
+    if 'API_PORT' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
         api_port = int(os.environ['API_PORT'])
-    else: 
-        api_port = defaults.API_PORT 
+    else:
+        api_port = defaults.API_PORT
         logger.warning(f"no server port given in environment, defaulting to {api_port}")
 
-    if 'SERVER_NAME' in os.environ.keys():
+    if 'SERVER_NAME' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
         server_name = os.environ['SERVER_NAME']
-    else: 
+    else:
         server_name = defaults.SERVER_NAME
         logger.warning(f"no server name given in environment, defaulting to {server_name}")
 
-    if 'TUNNEL_TOKEN' in os.environ.keys():
+    if 'TUNNEL_TOKEN' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
         tunnel_token = os.environ['TUNNEL_TOKEN']
     else:
         tunnel_token = ""
         logger.info("no tunnel token given in environment.")
 
-    if 'AUTO_CONNECT' in os.environ.keys():
+    if 'AUTO_CONNECT' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
         auto_connect = int(os.environ['AUTO_CONNECT']) == 1
     else:
         auto_connect = defaults.AUTOCONNECT
@@ -55,11 +57,11 @@ def main() -> Flask:
 
     cfg = config.BackendConfig()
 
-    if cfg.data["SERVER_NAME"] is not "":
+    if not cfg.data["SERVER_NAME"] == "":
         server_name =cfg.data["SERVER_NAME"]
         logger.info(f"Server name <{server_name}> from config file used")
 
-    if cfg.data["TUNNEL_TOKEN"] is not "":  
+    if not cfg.data["TUNNEL_TOKEN"] == "":  
         tunnel_token =cfg.data["TUNNEL_TOKEN"]
         logger.info(f"Tunnel token <{tunnel_token}> from config file used")
 
@@ -72,7 +74,7 @@ def main() -> Flask:
     # starting the api server
     ###########################################################
 
-    if server_name is "": 
+    if server_name == "":
         server_name = defaults.SERVER_NAME
         logger.info(f"No server name given, defaulting to <{server_name}>")
 
@@ -82,15 +84,19 @@ def main() -> Flask:
     logger.info(f"tunnel_token: {tunnel_token}")
 
     app = Flask(__name__)
+    #app = FastAPI()
+    
+    
+
 
     ###########################################################
     # api general things
     ###########################################################
 
     @app.get("/")
-    def root() -> str:    
+    def root() -> str:
         ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!<br>Link to a list of access points: <a href="/api/html">api</a></body></html>'
-        return ret_str 
+        return ret_str
 
     def get_api_list() -> list:
         list_of_aps =  ['%s' % rule for rule in app.url_map.iter_rules()]
@@ -104,20 +110,21 @@ def main() -> Flask:
     @app.get('/api/html')
     def api_html() -> str:
         list_of_aps = [f'<a href="http://localhost:{api_port}{ap}"> {ap} </a>' for ap in get_api_list()]
+        # TODO: replace localhost with the calling host !!
         str_of_aps  = "<br>\n".join(list_of_aps)
         return str_of_aps + "<br>\n"
 
     @app.get("/name")
-    def name() -> str:    
+    def name() -> str:
         return {'name': server_name }
 
 
     @app.get("/version")
-    def version() -> str:    
+    def version() -> str:
         return json.dumps({ "version":defaults.VERSION })
 
     @app.get("/builddate")
-    def builddate() -> str:    
+    def builddate() -> str:
         with open(defaults.BUILD_DATE_FILE, "r",encoding="utf-8") as file:
             ret_str = file.read().strip()
         return json.dumps({ "builddate":ret_str })
@@ -142,12 +149,13 @@ def main() -> Flask:
 
     @app.get('/warp/connector/get')
     def get_connector() -> str:
-        return {"token":warpcli.tunnel_token } 
+        return {"token":warpcli.tunnel_token }
 
     @app.get('/warp/connector/new')
     def new_connector() -> str:
-        tunnel_token = request.args.get('tunnel_token')        
-        if not tunnel_token is None and tunnel_token is not "":
+        tunnel_token = request.args.get('tunnel_token')
+        if (not tunnel_token is None ) and \
+           (not tunnel_token == "" ):
             logger.info(f"Tunnel token form intertface: {tunnel_token}")
             cfg.data["TUNNEL_TOKEN"] = tunnel_token
             cfg.store()
@@ -172,7 +180,7 @@ def main() -> Flask:
         return warpcli.settings()
 
     @app.get('/warp/debug/network')
-    def debug_network() -> str: 
+    def debug_network() -> str:
         return warpcli.debug_network()
 
     @app.get('/warp/debug/dex')
@@ -218,7 +226,7 @@ def main() -> Flask:
     @app.get('/wg/keys/public')
     def get_publickey():    
         privatekey = request.args.get('privatekey')
-        if privatekey is None: return {"status":"error","reason":"no private key given"}
+        if privatekey is None: return {"status":"error","reason":"no private key given"}  # pylint: disable=multiple-statements
         return { "status":"success", "publickey":wg.get_publickey( privatekey ), "privatekey":privatekey}
         
 
@@ -236,7 +244,41 @@ def main() -> Flask:
 
 
     if auto_connect:
-        logger.info("Autoconnect on, try to register")
-        logger.info("Autoconnect on, try to connect")
+        logger.info("Autoconnect on, doing the startup routine")
+        status = warpcli.get_status()
+        logger.info(f"warp status : {status}")
+        if isinstance(status,dict) and 'status' in status.keys():
+            if status['status'] == 'Unable':
+                status = warpcli.new_connector()
+                logger.info(f"cew connector : {status}")
+                i = 20
+                while i>0:
+                    status = warpcli.get_status()                    
+                    if isinstance(status,dict) and 'status' in status.keys():
+                        if status['status'] == 'Disconnected': break  # pylint: disable=multiple-statements
+                    time.sleep(0.2)
+                    i = i-1
+                # FIXME: sttua might be an error !!
 
-    return app
+            if status['status'] == 'Disconnected':
+                status = warpcli.connect()        
+                logger.info(f"connect : {status}")
+                i = 20
+                while i>0:
+                    status = warpcli.get_status()                    
+                    if isinstance(status,dict) and 'status' in status.keys():
+                        if status['status'] == 'Connected': break     # pylint: disable=multiple-statements
+                    time.sleep(0.2)
+                    i = i-1
+                # FIXME: sttua might be an error !!
+
+            if status['status'] == 'Connected':
+                logger.info("You are connected, nice!")
+
+
+    #if __name__ == '__main__': 
+    app.run(debug=True, port= api_port)
+
+
+
+    #return app

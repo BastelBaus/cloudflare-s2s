@@ -53,7 +53,7 @@ def do_api_call_ui(api: str):
 
  
 
-async def content() -> None:
+def content() -> None:
 
     #ui.select(['black', 'red', 'green', 'blue'],
     #          value=color, on_change=lambda e: set_color(e.value))
