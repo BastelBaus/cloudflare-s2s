@@ -1,19 +1,26 @@
-from contextlib import contextmanager
+#
+# The footer  which is shown above all
+#
+###############################################################################
+# pylint: disable=logging-fstring-interpolation
 
-from nicegui import ui,app
+from contextlib import contextmanager
+from nicegui import ui
+
+from . import defaults
 
 @contextmanager
-def frame(title: str, version : str):
+def frame(title: str, version : str) -> None:
     ui.add_head_html('<link href="https://unpkg.com/eva-icons@1.1.3/style/eva-icons.css" rel="stylesheet" />')
 
     with ui.footer().classes('w-full items-center'):
         ui.space()
-        ui.html("""<p>Copyright &copy; 2025, All Right Reserved <a href="https://nicegui.io/">cloudflare-s2s</a> | <a href="https://frycode-lab.com/">Frycode Lab.</a></p>""")
+        ui.html(f"""<p>Copyright &copy; 2025, All Right Reserved <a href="{defaults.GITHUB_LINK}">cloudflare-s2s</a> | <a href="{defaults.DOCKER_LINK}">BastelBaus</a></p>""")
         ui.space()
 
-        with ui.button(on_click= lambda: ui.run_javascript("window.open('https://github.com/frycodelab','_newtab')")).props("outline").style("margin-right:4px"):
+        with ui.button(on_click= lambda: ui.run_javascript(f"window.open('${defaults.GITHUB_LINK}','_newtab')")).props("outline").style("margin-right:4px"):
             ui.icon('eva-github', color="white").classes('text-5xl')
-            ui.tooltip("Got GitHub repo @frycodelab")
+            ui.tooltip("GitHub repo @bastelbaus")
         ui.space()
 
         # https://dash.cloudflare.com/

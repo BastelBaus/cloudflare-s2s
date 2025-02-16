@@ -9,7 +9,6 @@ import logging
 
 from backend.main import main
 
-
 logger = logging.getLogger(__name__)
 
 logging.basicConfig(
@@ -19,6 +18,4 @@ logging.basicConfig(
 
 
 if __name__ == "__main__":
-    #app = main()
     main()
-    
