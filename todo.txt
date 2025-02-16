@@ -5,3 +5,7 @@
    * should we make this a rotating log ??
 
    allow only IP addresses (specific) for other sites ??? Or give warnuing
+
+
+   change token over remote and re-connect
+    
