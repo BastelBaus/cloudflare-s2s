@@ -8,3 +8,5 @@
 
 config.json
 *.code-workspace
+
+app/data/*
