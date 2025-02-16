@@ -34,3 +34,5 @@ ip route add 192.168.0.228/32 dev cf-s2s
 
 
 git config --global core.autocrlf false
+
+netstat -tupln

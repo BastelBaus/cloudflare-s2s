@@ -95,7 +95,7 @@ def main() -> None: #-> Flask:
 
     @app.get("/")
     def root() -> str:
-        ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!<br>Link to a list of access points: <a href="/api/html">api</a></body></html>'
+        ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!<br>Link to a list of access points: <a href="/api/html">api</a></body></html>\n'
         return ret_str
 
     def get_api_list() -> list:
@@ -275,10 +275,6 @@ def main() -> None: #-> Flask:
             if status['status'] == 'Connected':
                 logger.info("You are connected, nice!")
 
-
-    #if __name__ == '__main__': 
-    app.run(debug=True, host="192.168.0.23",port= api_port)
-
-
+    app.run(debug=True, host="0.0.0.0",port= api_port)
 
     #return app
