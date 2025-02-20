@@ -109,7 +109,8 @@ def main() -> None: #-> Flask:
 
     @app.get('/api/html')
     def api_html() -> str:
-        list_of_aps = [f'<a href="http://localhost:{api_port}{ap}"> {ap} </a>' for ap in get_api_list()]
+        #list_of_aps = [f'<a href="http://localhost:{api_port}{ap}"> {ap} </a>' for ap in get_api_list()]
+        list_of_aps = [f'<a href="{ap}"> {ap} </a>' for ap in get_api_list()]
         # TODO: replace localhost with the calling host !!
         str_of_aps  = "<br>\n".join(list_of_aps)
         return str_of_aps + "<br>\n"

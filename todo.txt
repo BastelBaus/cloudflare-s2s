@@ -9,3 +9,9 @@
 
    change token over remote and re-connect
     
+
+    settings --> filter settings !! --> split tunnel
+      warp-cli -j settings
+
+
+    -> what is the connector 
