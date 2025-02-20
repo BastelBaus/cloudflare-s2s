@@ -192,6 +192,16 @@ def warp_search_backends(addr:str) -> dict|str:
     success,result = apicall( addr + "/warp/search_backends", timeout=120 )
     return result if success else "error"
 
+def nat_get_target(addr:str) -> dict | str:
+    ''' '''
+    success,result = apicall( addr + "/nat/dnat_target/get" )
+    return result if success else "error"
+
+def nat_set_target(addr:str,target:str) -> dict | str:
+    ''' '''
+    success,result = apicall( addr + f"/nat/dnat_target/set?target={target}" )
+    return result if success else "error"
+
 
 ###################################################################
 # functions wrapped in class whcih stores the API address
@@ -281,5 +291,11 @@ class site:
         '''
         return get_warp_status(self.addr)
 
+    def nat_get_target(self) -> str:
+        ''' '''
+        return nat_get_target(self.addr)
 
+    def nat_set_target(self,target:str) -> str:
+        ''' '''
+        return nat_set_target(self.addr,target)
 

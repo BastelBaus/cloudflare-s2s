@@ -30,9 +30,10 @@ services:
       - API_PORT=${API_PORT}            # the port of the API for this site
       - AUTO_CONNECT=1                  # Tries to automatically connect to the warp networp 
                                         #    yes: 1 (default)   no: 0
+      - SUBNET=${SUBNET}                # the subnet, needed to allow connection to the host itself
+
 
       # TODO: how to include the example,.env ??
-
     #  - PUID=1000 # change this to your user id
     #  - PGID=1000 # change this to your group id
     #  - STORAGE_SECRET="change-this-to-yor-own-private-secret"
@@ -56,8 +57,8 @@ networks:
     ipam:
       driver: default
       config:
-       - subnet: ${SUBNET}
-#         ip_range: 192.168.1.23/32
-         gateway: ${GATEWAY_IP}
+       - subnet: "${SUBNET}"
+         ip_range: "${ROUTER_IP}/32"     # block new IPs except the given
+         gateway: "${GATEWAY_IP}"
 
 

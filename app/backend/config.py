@@ -22,3 +22,4 @@ class BackendConfig(Config):
         if not isinstance(self.data,dict): self.data = {}
         if "TUNNEL_TOKEN"   not in self.data.keys(): self.data["TUNNEL_TOKEN"]   = ""
         if "SERVER_NAME"   not in self.data.keys(): self.data["SERVER_NAME"]   = ""
+        if "DNAT_TARGET"   not in self.data.keys(): self.data["DNAT_TARGET"]   = ""

@@ -214,6 +214,36 @@ def main() -> None: #-> Flask:
     def warp_search_backends():    
         return network.check_open_ports()
 
+    ###########################################################
+    # NFTables for natting
+    ###########################################################
+
+    @app.get('/nat/list')
+    def nat_list():
+        return network.nft_get_ruleset()
+
+    @app.get('/nat/clear')
+    def nat_clear():
+        network.nft_clear_nattable()
+        return {'status':'success'}
+
+    @app.get('/nat/create')
+    def nat_create():
+        network.nft_create_nattable()
+        return {'status':'success'}
+
+    @app.get('/nat/dnat_target/get')
+    def nat_get_target():
+        return {'target': cfg.data["DNAT_TARGET"]}
+    
+    @app.get('/nat/dnat_target/set')
+    def nat_set_target():
+        target = request.args.get('target')
+        cfg.data["DNAT_TARGET"] = target
+        cfg.store()
+        return {'target': cfg.data["DNAT_TARGET"]}
+    
+#
 
     ###########################################################
     # api the wireguard interface

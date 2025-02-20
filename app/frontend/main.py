@@ -28,7 +28,7 @@ else:
     app_port = defaults.WEB_PORT
 
 if  'SERVER_NAME' in os.environ.keys(): # pylint: disable=consider-iterating-dictionary
-    server_name = int(os.environ['SERVER_NAME'])
+    server_name = os.environ['SERVER_NAME']
 else:
     server_name = defaults.SERVER_NAME
 

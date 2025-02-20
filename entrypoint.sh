@@ -61,6 +61,21 @@ echo "Setting up wireguard"
 #ip link set up dev wg0
 
 ##############################################
+# adding up the outside route to host
+##############################################
+
+echo ""
+echo "---------------------------------------------"
+echo "allowing route to local host by routing      "
+echo "  all traffic from inside to outside trough  "
+echo "  the default interface and not the macvlan  "
+ip route del ${SUBNET}
+
+#old
+#localip=$(hostname  -i | cut -f1 -d' ')
+#ip route add via ${localip}
+
+##############################################
 # setting api-server and WebUI-server
 ##############################################
 
