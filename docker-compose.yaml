@@ -5,11 +5,15 @@ services:
     build:
       context: ./
       dockerfile: Dockerfile
+    restart: always
     #build:
     #  context: .
+
     ports: # host_port : docker_port
       - 15650:15650 # the WebUI
       - 15651:15651 # the REST API
+      - 51820:51820 # wireguard to test !
+
     volumes:
       - "C:/Users/pagantroll/Dokumente/01_Projekte/06_Software_Programming/15_cloudflared-s2s/app:/var/app2"
       
@@ -24,8 +28,37 @@ services:
     #  - STORAGE_SECRET="change-this-to-yor-own-private-secret"
 
     # some additonal settings needed for routing
+    #network_mode: "host"
     cap_add:
       - NET_ADMIN
     sysctls:
-      - net.ipv6.conf.all.disable_ipv6=0
+      #- net.ipv6.conf.all.disable_ipv6=0
       - net.ipv4.conf.all.src_valid_mark=1
+    networks:
+      - custom-bridge
+
+networks:
+  custom-bridge:
+    driver: bridge
+    ipam:
+      config:
+        - subnet: "192.168.10.0/24"
+          gateway: "192.168.10.1"
+
+#    networks:
+#      macvlan:
+#        ipv4_address: 192.168.10.17
+
+#networks:
+#  macvlan:
+#    name: macvlan
+#    driver: bridge
+#    #driver: macvlan
+#    driver_opts:
+#      parent: eth0
+#    ipam:
+#      config:
+#      - subnet: "192.168.10.0/24"
+#        gateway: "192.168.10.1"
+
+#        ip_range: "192.168.1.60/28"

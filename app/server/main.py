@@ -4,9 +4,12 @@
 from flask import Flask, request 
 import os
 import logging
+import json
+
 
 from cloudflared import warp_cli
 from wireguard import wireguard
+from network import network
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +32,8 @@ print(f"{tunnel_token=}")
 
 warpcli = warp_cli(tunnel_token)
 wg = wireguard()
+net = network()
+
 
 app = Flask(__name__)
 
@@ -96,6 +101,14 @@ def show_organization():
 def settings():    
     return warpcli.settings()
 
+@app.get('/warp/debug/network')
+def debug_network():    
+    return warpcli.debug_network()
+
+@app.get('/warp/debug/dex')
+def debug_dex():    
+    return warpcli.debug_dex()
+
 
 
 ###########################################################
@@ -112,3 +125,18 @@ def get_publickey():
     privatekey = request.args.get('privatekey')
     if privatekey is None: return None
     return wg.get_publickey( privatekey )
+
+
+###########################################################
+# The general network
+###########################################################
+
+
+
+@app.get('/net/interfaces')
+def get_interfaces():    
+    #y = json.loads(x)
+    return net.get_interfaces()
+
+
+

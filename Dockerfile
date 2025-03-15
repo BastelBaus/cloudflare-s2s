@@ -10,7 +10,7 @@ ENV API_PORT=15651
 #ENV FLASK_APP=app.py
 ENV FLASK_RUN_HOST=0.0.0.0
 ENV TUNNEL_TOKEN=${TUNNEL_TOKEN:-""}
-
+ENV CDIR_WG=192.168.242.1/24
 
 #ENV VERSION=$CLOUDFLARED_VERSION
 
@@ -33,7 +33,7 @@ RUN apt-get update
 RUN </dev/null DEBIAN_FRONTEND=noninteractive
 RUN apt-get --yes install --no-install-recommends  \
         curl gpg ca-certificates dbus \
-        cron tcpdump iputils-ping procps \ 
+        cron tcpdump iputils-ping procps telnet \ 
         wireguard \
         cargo                    
 

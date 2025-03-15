@@ -37,8 +37,8 @@ sleep "$WARP_SLEEP"
 ##############################################
 
 ip link add dev wg0 type wireguard
-#wg setconf wg0 /var/data/wireguard/myconfig.conf
-ip address add dev wg0 192.168.2.1/24
+ip address add dev wg0 $CDIR_WG
+wg setconf wg0 /var/app/wg.conf
 ip link set up dev wg0
 
 ##############################################

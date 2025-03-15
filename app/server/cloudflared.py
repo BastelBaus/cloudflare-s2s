@@ -63,6 +63,11 @@ class warp_cli:
     def settings(self):
         return self.__call_cloudflared('settings')            
         
+    def debug_network(self):
+        return self.__call_cloudflared('debug network')            
+
+    def debug_dex(self):
+        return self.__call_cloudflared('debug dex')            
 
         
     #################################################################
