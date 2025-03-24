@@ -2,6 +2,7 @@
 .container
 .env
 .conda
+.vscode
 
 **/*.pyc
 **/__pycache
