@@ -3,6 +3,7 @@
 .env
 .conda
 .vscode
+.pylintrc
 
 **/*.pyc
 **/__pycache
