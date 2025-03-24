@@ -1,5 +1,12 @@
+urllib3
+chardet
+charset-normalizer
+
+
 flask
-#nicegui
+
+nicegui
+nicegui[highcharts]
+
 #pyinstaller
 #pywebview
-#nicegui[highcharts]

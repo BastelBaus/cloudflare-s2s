@@ -13,6 +13,10 @@ The resulting key benefits are:
 * Includes network address translation to cope with same subnets (NAT)
 * Dockerized application with only minor 
 
+# Limitations
+
+* the server work only on linux since on windows there is no macvlan supported. However you could still connect from a windows warp client to the network
+
 # How it works 
 
 # How to use it

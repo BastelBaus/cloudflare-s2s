@@ -2,5 +2,12 @@
 .container
 .env
 .conda
+.vscode
 
 **/*.pyc
+**/__pycache
+
+config.json
+*.code-workspace
+
+data/*
