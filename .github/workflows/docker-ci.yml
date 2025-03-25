@@ -38,6 +38,6 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ steps.meta.outputs.tags }}
-          #tags: "cloudflare-s2s:dev"
+          #tags: ${{ steps.meta.outputs.tags }}
+          tags: bastelbaus/cloudflare-s2s:dev
           labels: ${{ steps.meta.outputs.labels }}
