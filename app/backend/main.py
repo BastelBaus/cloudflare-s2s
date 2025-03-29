@@ -229,8 +229,17 @@ def main() -> None: #-> Flask:
 
     @app.get('/nat/create')
     def nat_create():
-        network.nft_create_nattable()
-        return {'status':'success'}
+        cfg.data["DNAT_TARGET"]
+        
+        from_subnet = warpcli.estimate_own_subnet()
+        to_subnet = cfg.data["DNAT_TARGET"]
+    
+        logger.info(f"Create DNAT from {from_subnet} to {to_subnet}")
+        res = network.nft_create_nattable(from_subnet,to_subnet)
+        logger.info(f" --> {res}")
+
+        #return {'status':'success'}
+        return {'status': res}
 
     @app.get('/nat/dnat_target/get')
     def nat_get_target():

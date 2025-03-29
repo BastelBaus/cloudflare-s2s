@@ -58,14 +58,15 @@ def nft_clear_nattable() -> None:
     __call_command(f"{_NFT} add table ip natrouting")  # ensure, table exists
     __call_command(f"{_NFT} delete table ip natrouting") 
 
-def nft_create_nattable() -> None | str:
+def __old_nft_create_nattable(warpcli,cfg) -> None | str:
     ''' returns None on success else the error message as string '''
-    from_subnet = "192.168.16.0/23"
-    #from_subnet = warpcli.estimate_own_subnet()
-    to_subnet   = "192.168.0.0/23"
-    return _nft_create_nattable(from_subnet,to_subnet)
+    #from_subnet = "192.168.16.0/23"
+    #to_subnet   = "192.168.0.0/23"
 
-def _nft_create_nattable(from_subnet,to_subnet) -> bool:
+    #return _nft_create_nattable(from_subnet,to_subnet)
+    pass
+
+def nft_create_nattable(from_subnet,to_subnet) -> bool:
     ''' returns None on success else the error message as string '''
     ret = __call_command(f"{_NFT} add table ip natrouting")  # ensure, table exists
     print("len",len(ret))
@@ -84,6 +85,8 @@ def _nft_create_nattable(from_subnet,to_subnet) -> bool:
     if ret !="": return ret
     ret = __call_command(f"{_NFT} add 'rule natrouting snating iifname \"CloudflareWARP\" masquerade'")
     if ret !="": return ret
+
+    return "success"
 
 
 ###############################################################################
