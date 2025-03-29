@@ -60,9 +60,9 @@ def nft_clear_nattable() -> None:
 
 def nft_create_nattable() -> None | str:
     ''' returns None on success else the error message as string '''
-    from_subnet = "192.168.4.0/24"
+    from_subnet = "192.168.16.0/23"
     #from_subnet = warpcli.estimate_own_subnet()
-    to_subnet   = "192.168.0.0/24"
+    to_subnet   = "192.168.0.0/23"
     return _nft_create_nattable(from_subnet,to_subnet)
 
 def _nft_create_nattable(from_subnet,to_subnet) -> bool:

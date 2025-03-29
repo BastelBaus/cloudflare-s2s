@@ -53,7 +53,7 @@ networks:
   macvlan_network:
     driver: macvlan
     driver_opts:
-      parent: eth0
+      parent: eth0                       # put here the device of your server ethernet (i.e. get it by "ip -a")
     ipam:
       driver: default
       config:
