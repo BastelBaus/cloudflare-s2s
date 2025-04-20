@@ -102,6 +102,7 @@ class siteHandler:
         if not isinstance(info,dict): return f"Error: {info}"
         mysubnet  = self.api.warp_my_subnet()
         nat_target_subnet =  self.api.nat_get_target()
+        nat_target_subnet = nat_target_subnet['target'] if 'target' in nat_target_subnet.keys() else nat_target_subnet
         myip      = self.api.warp_my_ip()
         vnets     = self.api.warp_get_vnets()
         docker_if = self.api.docker_interfaces()

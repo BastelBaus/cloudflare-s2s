@@ -69,7 +69,7 @@ echo "---------------------------------------------"
 echo "allowing route to local host by routing      "
 echo "  all traffic from inside to outside trough  "
 echo "  the default interface and not the macvlan  "
-ip route del ${SUBNET}
+#ip route del ${SUBNET}
 
 #old
 #localip=$(hostname  -i | cut -f1 -d' ')
