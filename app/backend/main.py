@@ -252,7 +252,6 @@ def main() -> None: #-> Flask:
         cfg.store()
         return {'target': cfg.data["DNAT_TARGET"]}
     
-#
 
     ###########################################################
     # api the wireguard interface
@@ -282,7 +281,6 @@ def main() -> None: #-> Flask:
     # starting the app and the main interface classes
     ###########################################################
 
-
     if auto_connect:
         logger.info("Autoconnect on, doing the startup routine")
         status = warpcli.get_status()
@@ -290,7 +288,7 @@ def main() -> None: #-> Flask:
         if isinstance(status,dict) and 'status' in status.keys():
             if status['status'] == 'Unable':
                 status = warpcli.new_connector()
-                logger.info(f"cew connector : {status}")
+                logger.info(f"new connector : {status}")
                 i = 20
                 while i>0:
                     status = warpcli.get_status()                    

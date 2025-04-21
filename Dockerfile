@@ -37,7 +37,7 @@ RUN </dev/null DEBIAN_FRONTEND=noninteractive
 
 # install some tools for net monitoring
 RUN apt-get --yes install --no-install-recommends \
-     curl cron tcpdump iputils-ping procps telnet mtr nmap net-tools
+     curl cron tcpdump iputils-ping procps telnet mtr nmap net-tools openssh-server
 
 # install wireguard
 RUN apt-get --yes install --no-install-recommends  wireguard
