@@ -96,6 +96,7 @@ def main() -> None: #-> Flask:
     @app.get("/")
     def root() -> str:
         ret_str = '<html><body>Welcome to bastelbaus cloudflared-s2s!<br>Link to a list of access points: <a href="/api/html">api</a></body></html>\n'
+        print("DEBUG HERE")
         return ret_str
 
     def get_api_list() -> list:

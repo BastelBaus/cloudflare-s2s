@@ -18,7 +18,7 @@ table netdev monitoring {
 table ip routing {
   chain forward { 
         type filter hook prerouting priority  -1;
-	ip protocol icmp accept
+	      ip protocol icmp accept
   }
 }
 
