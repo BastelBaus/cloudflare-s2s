@@ -256,7 +256,7 @@ class siteHandler:
         if self.warp_registered:
             status = self.api.warp_unregister()
         else:
-            status = self.api.warp_register()
+            status = self.api.warp_register(self.site["token"])
         #print("Register Button",self.warp_registered,status)
         self.check_warp_connection()
 

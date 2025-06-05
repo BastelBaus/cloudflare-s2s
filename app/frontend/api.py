@@ -119,9 +119,9 @@ def get_connector(addr:str) -> str:
     return result["token"] if success and "token" in result.keys() else "unkown"
 
 
-def warp_register(addr:str) -> bool:
+def warp_register(addr:str,token) -> bool:
     ''' '''
-    success,result = apicall( addr + "/warp/connector/new" )
+    success,result = apicall( addr + "/warp/connector/new?tunnel_token=" + token )
     return success
 
 def warp_unregister(addr:str) -> bool:
@@ -240,9 +240,9 @@ class site:
         ''' '''
         return get_site_name(self.addr)
 
-    def warp_register(self) -> bool:
+    def warp_register(self,token) -> bool:
         ''' '''
-        return warp_register(self.addr)
+        return warp_register(self.addr,token)
 
     def warp_unregister(self) -> bool:
         ''' '''
