@@ -162,7 +162,10 @@ def main() -> None: #-> Flask:
             cfg.data["TUNNEL_TOKEN"] = tunnel_token
             cfg.store()
             return warpcli.new_connector(tunnel_token)
-        logger.info(f"Tunnel token form intertface <{tunnel_token}> ignored")
+        else: logger.info(f"Tunnel token from intertface ignored (token={tunnel_token})")
+        if (not cfg.data["TUNNEL_TOKEN"] is None) and \
+            (not cfg.data["TUNNEL_TOKEN"]  == ""):
+            return warpcli.new_connector(cfg.data["TUNNEL_TOKEN"])                
         return { "error" : "no tunnel token given" }        
 
     @app.get('/warp/registration/show')
