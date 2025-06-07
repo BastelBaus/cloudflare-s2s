@@ -146,6 +146,8 @@ class siteHandler:
 
         self.warp_tooltip          =  f"Status of warp connection, checked every {defaults.WARP_CHECK_TIME} seconds"
 
+        # TODO: need state "registering" to wait until registering is complete
+
         if state == "Connected": # if true, we changed from not connected to connected
             self.warp_connected        = True
             self.warp_registered       = True
