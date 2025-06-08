@@ -78,13 +78,11 @@ def nft_create_nattable(from_subnet,to_subnet) -> bool:
     ret = __call_command(f"{_NFT} add 'rule {_NATTABLE} dnating "
                               f"ip daddr {from_subnet} dnat ip prefix to "
                               f"ip daddr map {{ {from_subnet} : {to_subnet} }}'" )
-    print("len",len(ret))
-    print(f">{ret}<")    
     if ret !="": return ret
 
     ret = __call_command(f"{_NFT} add 'chain ip {_NATTABLE} snating {{ type nat hook postrouting priority srcnat; policy accept; }}'")
     if ret !="": return ret
-    ret = __call_command(f"{_NFT} add 'rule {_NATTABLE} snating iifname \"CloudflareWARP\" masquerade'")
+    ret = __call_command(f"{_NFT} add 'rule {_NATTABLE} snating oifname \"CloudflareWARP\" masquerade'")
     if ret !="": return ret
 
     return "success"
